@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Codepath — Your coding coach"
+description = "A personal web development learning app with a skills check, interactive JavaScript practice, guided projects, and spaced review."
+version = "1.0.0"
+id = "artifacts/codepath"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21024
+
+[services.development]
+run = "pnpm --filter @workspace/codepath run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/codepath", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/codepath/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21024"
+BASE_PATH = "/"
