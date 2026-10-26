@@ -1,5 +1,7 @@
 # Codepath
 
+[Open the live app](https://daxtonzimmerman.github.io/codepath/)
+
 Codepath is a web development learning app that helps people practice JavaScript by building real projects. It combines short lessons, review exercises, and a browser-based Project Studio where learners can write HTML, CSS, and JavaScript, preview their work, and export it as a ZIP.
 
 ## What it does
@@ -37,6 +39,10 @@ React, TypeScript, Vite, Tailwind CSS, Vitest, IndexedDB, and pnpm workspaces.
 
 Progress and projects are stored in the browser, so they do not sync across devices. The Studio preview supports a deliberately limited browser API; exported projects run as normal browser files. Publishing a project is a separate manual step.
 
+## Deployment
+
+Pushes to `main` run the tests, type check, and production build, then publish to GitHub Pages. The deployed app uses `/codepath/` as its base path, with a fallback page for direct links and refreshes.
+
 ## Origin
 
-This repository is a working copy of my [Replit project](https://replit.com/@DaxtonZimmerman/Personal-Web-Development-Coach). The [public app](https://personal-web-development-coach.replit.app/) may show an earlier release until it is republished.
+This repository is a working copy of my [Replit project](https://replit.com/@DaxtonZimmerman/Personal-Web-Development-Coach). The [original Replit deployment](https://personal-web-development-coach.replit.app/) may show an earlier release.
