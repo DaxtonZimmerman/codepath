@@ -29,10 +29,10 @@ export function duplicateOf(p: StudioProject): StudioProject {
 }
 
 const NEXT = [
-  { title: "Personal Tracker", uses: "Forms, state, local saving, editing, deletion", where: "Builds inside Codepath" },
-  { title: "API Explorer", uses: "fetch, promises, loading, errors, retry", where: "Builds inside Codepath" },
+  { title: "Personal Tracker", uses: "Forms, state, local saving, editing, deletion", where: "Planned" },
+  { title: "API Explorer", uses: "fetch, promises, loading, errors, retry", where: "Planned" },
   { title: "React Task Tracker", uses: "Components, state, tests", where: "Planned" },
-  { title: "Full-stack Dashboard", uses: "An API and database", where: "Its own Replit project, tracked here" },
+  { title: "Full-stack Dashboard", uses: "An API and database", where: "Planned · separate app" },
 ];
 
 export default function Build() {
@@ -62,12 +62,25 @@ export default function Build() {
   return (
     <div className="max-w-4xl">
       <PageHeader kicker="Build" title={<>Make something <span className="marker">that works.</span></>}>
-        Real browser apps from index.html, styles.css and script.js. Everything saves in this browser and exports as a runnable ZIP.
+        Choose a guided project or start with your own idea. Write code, see it work, then export an app you can share.
       </PageHeader>
+
+      <ol aria-label="How building works" className="mb-6 grid gap-3 sm:grid-cols-3">
+        {[
+          ["Choose an app", "Follow a guide or bring your own idea."],
+          ["Build and try it", "Edit your code and check the preview."],
+          ["Make it yours", "Export your files and publish when ready."],
+        ].map(([title, detail], i) => (
+          <li key={title} className="flex gap-3 rounded-2xl border bg-card p-4">
+            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary/10 font-mono text-xs font-semibold text-primary">{i + 1}</span>
+            <div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs text-muted-foreground">{detail}</p></div>
+          </li>
+        ))}
+      </ol>
 
       <div className="grid md:grid-cols-[1.4fr_1fr] gap-4">
         <div className="rise rounded-3xl bg-ink text-background p-6 sm:p-8" data-testid="card-guided">
-          <p className="font-mono text-xs uppercase tracking-widest text-marker">1 · Choose a guided project</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-marker">Recommended · guided project</p>
           <h2 className="mt-3 font-display text-3xl font-extrabold">Product Filter App</h2>
           <p className="mt-2 text-background/70">A clothing catalog with search, category filters, price sorting and an empty state. Six small milestones, automated checks, three levels of help.</p>
           <p className="mt-3 font-mono text-xs text-background/55">Arrays · objects · DOM rendering · events · state</p>
@@ -83,9 +96,9 @@ export default function Build() {
           </div>
         </div>
         <div className="rise rounded-3xl border-2 border-foreground/80 bg-card p-6 sm:p-8 flex flex-col" style={{ animationDelay: "60ms" }} data-testid="card-own">
-          <p className="font-mono text-xs uppercase tracking-widest text-primary">2 · Start my own project</p>
-          <h2 className="mt-3 font-display text-2xl font-extrabold">A blank app, your idea</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Three starter files and a live preview. No checklist, just your own notes and versions.</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-primary">Have an idea?</p>
+          <h2 className="mt-3 font-display text-2xl font-extrabold">Start a blank app</h2>
+          <p className="mt-2 text-sm text-muted-foreground">An HTML page, a stylesheet and a JavaScript file, ready to edit. Use the live preview to bring your idea to life.</p>
           <button disabled={busy} onClick={() => create("blank")} className="press mt-auto pt-6 inline-flex items-center gap-2 font-semibold text-primary disabled:opacity-50 self-start" data-testid="button-new-blank"><Sparkles className="size-4" /> Start blank project</button>
         </div>
       </div>
@@ -133,8 +146,11 @@ export default function Build() {
         )}
       </section>
 
-      <section className="mt-12" aria-labelledby="next-h">
-        <h2 id="next-h" className="font-display text-xl font-bold">Coming next on the project path</h2>
+      <p className="mt-6 text-sm text-muted-foreground">Your projects save in this browser. <Link href="/settings" className="underline underline-offset-4 text-foreground">Download a backup</Link> to keep a separate copy.</p>
+
+      <details className="mt-10 rounded-2xl border border-dashed p-5">
+        <summary className="cursor-pointer font-semibold">More projects on the roadmap</summary>
+        <p className="mt-2 text-sm text-muted-foreground">These guides are planned. Start with Product Filter or use a blank app today.</p>
         <ol className="mt-4 grid sm:grid-cols-2 gap-3">
           {NEXT.map((n, i) => (
             <li key={n.title} className="rounded-2xl border border-dashed p-4 text-sm">
@@ -145,7 +161,7 @@ export default function Build() {
           ))}
         </ol>
         <p className="mt-6 text-sm text-muted-foreground">Looking for the older project checklists? <Link href="/projects" className="underline underline-offset-4 text-foreground" data-testid="link-legacy-projects">Open legacy projects</Link></p>
-      </section>
+      </details>
 
       <AlertDialog open={!!del} onOpenChange={(o) => !o && setDel(null)}>
         <AlertDialogContent>

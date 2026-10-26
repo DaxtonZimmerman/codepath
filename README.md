@@ -12,17 +12,17 @@ Codepath is a web development learning app that helps people practice JavaScript
 
 ## Run locally
 
-You need Node.js 24 and pnpm.
+You need Node.js 24 and pnpm 11.25.0.
 
 ```bash
 pnpm install
-pnpm --filter @workspace/codepath dev
+pnpm dev
 ```
 
-Open the local address shown by Vite. To check the app:
+Open http://localhost:5173 (or the local address shown by Vite). To check the app:
 
 ```bash
-pnpm --filter @workspace/codepath test
+pnpm test
 pnpm --filter @workspace/codepath typecheck
 pnpm --filter @workspace/codepath build
 ```
