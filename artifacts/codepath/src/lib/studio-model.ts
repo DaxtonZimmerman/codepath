@@ -8,6 +8,7 @@ const date = z.string().refine((s) => Number.isFinite(Date.parse(s)));
 export const checkSchema = z.object({ id: z.string(), label: z.string(), passed: z.boolean(), expected: z.string(), actual: z.string(), concept: z.string() });
 export type CheckResult = z.infer<typeof checkSchema>;
 export const projectSchema = z.object({
+  courseId: z.string().max(80).optional(),
   id: z.string().min(1).max(100), kind: z.enum(["product-filter", "blank"]),
   title: z.string().min(1).max(160), description: z.string().max(3000),
   files: filesSchema, notes: z.string().max(100000),

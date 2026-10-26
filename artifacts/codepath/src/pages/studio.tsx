@@ -4,6 +4,7 @@ import {
   ArrowLeft, Copy, Download, History, RotateCcw, CheckCircle2, Circle, XCircle, Lightbulb, BookOpen, Dumbbell,
   Eye, AlertTriangle, Loader2, FlaskConical, ClipboardCopy, RotateCw, FileDown, ChevronRight,
 } from "lucide-react";
+import { courseById } from "@/lib/bootcamp";
 import { useProjects, saveProject, refreshProjects } from "@/lib/studio-db";
 import { FILE_NAMES, fingerprint, isComplete, validUrl, type FileName, type StudioProject, type CheckResult } from "@/lib/studio-model";
 import { MILESTONES, PRODUCT_EXAMPLE, PRODUCT_STARTER, BLANK_STARTER, PRODUCTS } from "@/lib/studio-content";
@@ -98,6 +99,7 @@ export default function Studio() {
     const qs = Number(search.get("step"));
     const s0 = Number.isInteger(qs) && qs >= 0 && qs <= 5 && search.has("step") ? qs : stored.step;
     setStep(s0);
+    if (stored.courseId === "web") setFile("index.html");
     init({ ...stored, lastOpenedAt: new Date().toISOString() });
     update((x) => ({ ...x, step: s0 }), true);
     document.title = `${stored.title} · Build · Codepath`;
@@ -185,6 +187,7 @@ export default function Studio() {
 
   return (
     <div className="space-y-6 min-w-0">
+      {p.courseId && courseById(p.courseId) && <Link href={`/learn/${p.courseId}#project`} className="flex items-center gap-3 rounded-xl border bg-card px-4 py-3 text-sm" data-testid="link-bootcamp-project"><BookOpen className="size-4 shrink-0 text-primary" /><span><strong>{courseById(p.courseId)?.title}</strong> · Open your module brief and project review</span><ChevronRight className="ml-auto size-4 shrink-0" /></Link>}
       {/* Header: where am I, save state, main actions */}
       <header className="space-y-3">
         <Link href="/build" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="size-4" /> Build</Link>

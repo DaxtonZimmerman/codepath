@@ -42,3 +42,12 @@ describe("authored Product Filter reference", () => {
     expect(request({ type: "event", selector: "#search", event: "input", value: "" }).cards).toHaveLength(6);
   });
 });
+
+// Both implementations below are trusted test fixtures authored for this check.
+it("rejects mutation even when the returned value matches", () => {
+  const tests = [{ args: [["html"], "css"], expected: ["html", "css"], label: "preserve input", preserveArgs: true }];
+  const bad = request({ type: "challenge", functionName: "addTag", code: "function addTag(tags, tag) { tags.push(tag); return tags; }", tests: structuredClone(tests) });
+  expect(bad[0].passed).toBe(false);
+  const good = request({ type: "challenge", functionName: "addTag", code: "function addTag(tags, tag) { return [...tags, tag]; }", tests: structuredClone(tests) });
+  expect(good[0].passed).toBe(true);
+});

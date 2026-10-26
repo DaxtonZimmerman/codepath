@@ -1,10 +1,14 @@
-export type Test = { args: unknown[]; expected: unknown; label: string };
+import { BOOTCAMP_LESSONS } from "./bootcamp-lessons";
+import { COURSES } from "./bootcamp";
+import type { PageExercise } from "./page-exercises";
+export type Test = { args: unknown[]; expected: unknown; label: string; preserveArgs?: boolean };
 export type Challenge = { functionName: string; prompt: string; starter: string; tests: Test[]; hints: string[]; concept: string };
 export type QuizQ = { q: string; options: string[]; answer: number; explanation: string };
 export type Lesson = {
   id: string; track: string; title: string; minutes: number; summary: string;
   body: string[]; example: string; takeaways: string[];
-  challenge?: Challenge; quiz?: QuizQ[];
+  challenge?: Challenge; quiz?: QuizQ[]; pageExercise?: PageExercise;
+  lab?: { task: string; steps: string[]; verify: string };
 };
 
 export const TRACKS = [
@@ -22,7 +26,7 @@ export const TRACKS = [
   { id: "ship", name: "Deploy & Security", blurb: "Putting it online, safely." },
 ];
 
-export const LESSONS: Lesson[] = [
+const CORE_LESSONS: Lesson[] = [
   {
     id: "html-semantics", track: "web", title: "Semantic HTML that explains itself", minutes: 8,
     summary: "Pick elements for what content means, not how it looks.",
@@ -491,6 +495,13 @@ if (!key) throw new Error("Missing WEATHER_API_KEY");`,
     },
   },
 ];
+
+const allLessons = [...CORE_LESSONS, ...BOOTCAMP_LESSONS];
+export const LESSONS: Lesson[] = COURSES.flatMap((course) => course.lessons.map((id) => {
+  const lesson = allLessons.find((item) => item.id === id);
+  if (!lesson) throw new Error(`Missing bootcamp lesson: ${id}`);
+  return lesson;
+}));
 
 export const lessonById = (id: string) => LESSONS.find((l) => l.id === id);
 export const trackName = (id: string) => TRACKS.find((t) => t.id === id)?.name ?? id;

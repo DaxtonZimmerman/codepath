@@ -100,8 +100,13 @@ self.onmessage = ({ data }) => {
         if (x && typeof x === "object") return `{${Object.keys(x).sort().map((k) => `${JSON.stringify(k)}:${canonical((x as Record<string, unknown>)[k])}`).join(",")}}`;
         return JSON.stringify(x) ?? "undefined";
       };
-      const results = tests.map((t: { args: unknown[]; expected: unknown; label: string }) => {
-        try { const actual = fn(...t.args); return { label: t.label, passed: canonical(actual) === canonical(t.expected), actual: text(actual), expected: text(t.expected) }; }
+      const results = tests.map((t: { args: unknown[]; expected: unknown; label: string; preserveArgs?: boolean }) => {
+        try {
+          const before = canonical(t.args);
+          const actual = fn(...t.args);
+          const unchanged = !t.preserveArgs || before === canonical(t.args);
+          return { label: t.label, passed: unchanged && canonical(actual) === canonical(t.expected), actual: text(actual) + (unchanged ? "" : " (input changed)"), expected: text(t.expected) + (t.preserveArgs ? " without changing inputs" : "") };
+        }
         catch (e) { return { label: t.label, passed: false, actual: String(e), expected: text(t.expected) }; }
       });
       send({ type: "reply", id, result: results });

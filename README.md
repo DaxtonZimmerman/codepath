@@ -6,7 +6,10 @@ Codepath is a web development learning app that helps people practice JavaScript
 
 ## What it does
 
-- Guides learners from a goal to lessons, practice, and a project.
+- Offers a 12-module, 60-lesson bootcamp from HTML and CSS through JavaScript, React, APIs, SQL, testing, and deployment.
+- Includes six browser HTML/CSS labs, JavaScript challenges with automated cases, and knowledge checks.
+- Gives every module a project brief, deliverables, saved reflection, and a self-review.
+- Links supported frontend projects to Project Studio; advanced projects run in a separate editor or Replit.
 - Saves learning progress and projects in the browser, with backup and restore tools.
 - Offers a Project Studio with starter projects, code versions, behavior checks, and reflection prompts.
 - Runs learner code in an isolated preview with time limits.

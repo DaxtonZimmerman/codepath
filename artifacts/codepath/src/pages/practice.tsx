@@ -17,7 +17,7 @@ export default function Practice() {
   const [status, setStatus] = useState<(typeof STATUS)[number][0]>("all");
   const due = dueReviews(s);
   const upcoming = upcomingReviews(s);
-  const challenges = LESSONS.filter((l) => l.challenge);
+  const challenges = LESSONS.filter((l) => l.challenge || l.pageExercise);
   const trackIds = Array.from(new Set(challenges.map((c) => c.track)));
 
   const list = useMemo(() => challenges.filter((l) => {
@@ -27,7 +27,7 @@ export default function Practice() {
     if (status === "new" && st !== "new") return false;
     if (status === "missed" && !(st === "missed" && true)) return false;
     const term = q.toLowerCase();
-    return !term || l.title.toLowerCase().includes(term) || l.challenge!.concept.toLowerCase().includes(term) || l.challenge!.functionName.toLowerCase().includes(term);
+    return !term || l.title.toLowerCase().includes(term) || (l.challenge?.concept ?? l.summary).toLowerCase().includes(term) || (l.challenge?.functionName ?? l.pageExercise?.language ?? "").toLowerCase().includes(term);
   }), [challenges, s, track, status, q]);
 
   return (
@@ -95,9 +95,9 @@ export default function Practice() {
               <li key={l.id}>
                 <Link href={`/lesson/${l.id}`} className="lift flex flex-col h-full rounded-2xl border bg-card p-5" data-testid={`card-challenge-${l.id}`}>
                   <div className="flex items-center gap-2"><StatusDot status={lessonStatus(s, l.id)} /><span className="font-mono text-xs text-muted-foreground">{trackName(l.track)}</span></div>
-                  <p className="mt-3 font-mono text-sm font-semibold text-primary">{l.challenge!.functionName}()</p>
-                  <p className="font-semibold mt-1">{l.challenge!.concept}</p>
-                  <p className="mt-auto pt-4 font-mono text-xs text-muted-foreground">{l.challenge!.tests.length} tests · {l.challenge!.hints.length} hints · {tries} tries</p>
+                  <p className="mt-3 font-mono text-sm font-semibold text-primary">{l.challenge ? `${l.challenge.functionName}()` : `${l.pageExercise!.language.toUpperCase()} lab`}</p>
+                  <p className="font-semibold mt-1">{l.challenge?.concept ?? l.title}</p>
+                  <p className="mt-auto pt-4 font-mono text-xs text-muted-foreground">{l.challenge?.tests.length ?? l.pageExercise!.checks.length} checks · {l.challenge?.hints.length ?? l.pageExercise!.hints.length} hints · {tries} tries</p>
                 </Link>
               </li>
             );

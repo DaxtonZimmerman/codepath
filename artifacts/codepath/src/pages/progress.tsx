@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { useStore, dayKey, addDays, streak } from "@/lib/store";
 import { LESSONS, TRACKS, lessonById, PROJECTS } from "@/lib/curriculum";
+import { COURSES } from "@/lib/bootcamp";
 import { prettyDate } from "@/lib/progress";
 import { PageHeader } from "@/components/shell";
 import { cn } from "@/lib/utils";
@@ -56,13 +57,14 @@ export default function ProgressPage() {
               const p = ls.filter((l) => s.completed[l.id]).length;
               return (
                 <li key={t.id}>
-                  <div className="flex justify-between text-sm"><span>{t.name}</span><span className="font-mono text-xs">{p}/{ls.length}</span></div>
+                  <div className="flex justify-between text-sm"><Link href={`/learn/${t.id}`} className="hover:underline">{t.name}</Link><span className="font-mono text-xs">{p}/{ls.length}</span></div>
                   <div className="mt-1 h-2 rounded-full bg-muted overflow-hidden"><div className="h-full bg-pine transition-[width] duration-700" style={{ width: `${(p / ls.length) * 100}%` }} /></div>
                 </li>
               );
             })}
           </ul>
-          <p className="mt-6 text-sm text-muted-foreground">Projects marked done (self-reported): {PROJECTS.filter((p) => s.projects[p.id]?.doneAt).length} of {PROJECTS.length}</p>
+          <p className="mt-6 text-sm text-muted-foreground">Bootcamp project reviews (self-reported): {COURSES.filter((course) => s.projects[`bootcamp-${course.id}`]?.doneAt).length} of {COURSES.length}. <Link href="/learn" className="underline">Open bootcamp</Link></p>
+          <p className="mt-2 text-sm text-muted-foreground">Legacy projects marked done (self-reported): {PROJECTS.filter((p) => s.projects[p.id]?.doneAt).length} of {PROJECTS.length}</p>
         </section>
 
         <section className="space-y-6">
