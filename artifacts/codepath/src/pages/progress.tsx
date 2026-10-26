@@ -28,8 +28,8 @@ export default function ProgressPage() {
       <dl className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         {[
           ["Lessons passed", `${completed.length}`, `of ${LESSONS.length}`],
-          ["Attempts", `${s.attempts.length}`, "challenges + quizzes"],
-          ["Pass rate", passRate === null ? "--" : `${passRate}%`, "of all attempts"],
+          ["Lesson attempts", `${s.attempts.length}`, "lesson challenges + checks"],
+          ["Lesson pass rate", passRate === null ? "--" : `${passRate}%`, "of lesson attempts"],
           ["Streak", `${streak(s.activity)}`, "days in a row"],
         ].map(([k, v, sub], i) => (
           <div key={k} className="rounded-2xl border bg-card p-5 rise" style={{ animationDelay: `${i * 50}ms` }}>
@@ -52,7 +52,7 @@ export default function ProgressPage() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         <section className="rounded-3xl border bg-card p-6">
-          <h2 className="font-display text-xl font-bold mb-4">By track</h2>
+          <h2 className="font-display text-xl font-bold mb-4">Lesson results by track</h2>
           <ul className="space-y-3">
             {TRACKS.map((t) => {
               const ls = LESSONS.filter((l) => l.track === t.id);
@@ -81,7 +81,7 @@ export default function ProgressPage() {
             )}
           </div>
           <div className="rounded-3xl border bg-card p-6">
-            <h2 className="font-display text-xl font-bold mb-4">Recent attempts</h2>
+            <h2 className="font-display text-xl font-bold mb-4">Recent lesson attempts</h2>
             {recent.length === 0 ? <p className="text-sm text-muted-foreground">Your run history will appear here.</p> : (
               <ul className="space-y-1.5">{recent.map((a, i) => (
                 <li key={i} className="flex items-center gap-3 text-sm">

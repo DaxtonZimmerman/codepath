@@ -2,7 +2,7 @@ import { describe,it,expect } from 'vitest';
 import { COURSES } from './bootcamp';
 import { LESSONS } from './curriculum';
 import { MODULE_ACTIVITIES,activityKey } from './module-activities';
-import { QUESTION_BANK,createQuiz,gradeQuiz,validSession,questionById,readingQuestions,nextLearningAction,workshopDone } from './learning';
+import { QUESTION_BANK,createQuiz,gradeQuiz,validSession,questionById,readingQuestions,nextLearningAction,workshopDone,workshopSeed } from './learning';
 import { emptyLearning,evidenceMatches,mergeLearning } from './learning-progress';
 import { validateProgress } from './progress-schema';
 import { inspectBackup,mergeProgress } from './backup';
@@ -52,4 +52,13 @@ describe('bootcamp assessment and activity integrity',()=>{
  it('merges newer evidence and deduplicates quiz history without reviving a completed session',()=>{
   const a=emptyLearning(),b=emptyLearning();const q=createQuiz('js');q.items.forEach(i=>i.pick=i.order.indexOf(questionById(i.questionId)!.answer));const attempt=gradeQuiz(q,'js');a.quizzes.js={active:null,attempts:[attempt]};b.quizzes.js={active:q,attempts:[]};expect(mergeLearning(a,b).quizzes.js.active).toBeNull();expect(mergeLearning(a,a).quizzes.js.attempts).toHaveLength(1);
  });
+});
+
+it('resumes a workshop from passed learner code, merges external files, and identifies reference fallbacks',()=>{
+ const s=state();const key='workshop:js:subtotal';const own='function subtotal(p,q){ /* my code */ return p*q; }';
+ expect(workshopSeed(s,'js',1)).toBe(MODULE_ACTIVITIES.js.workshop.steps[0].solution);
+ s.drafts[key]=own;s.learning.evidence[key]={at,source:own,mode:'tests',results:[{label:'all',passed:true}]};expect(workshopSeed(s,'js',1)).toBe(own);
+ const files=JSON.stringify({'README.md':'My own instructions','index.html':'My page'});s.drafts['workshop:git:local']=files;s.learning.evidence['workshop:git:local']={at,source:files,mode:'self-review',results:[{label:'reviewed',passed:true}]};
+ const seed=JSON.parse(workshopSeed(s,'git',1)!);expect(seed['README.md']).toBe('My own instructions');expect(seed['index.html']).toBe('My page');expect(seed['WORKFLOW.md']).toContain('git diff');
+ s.drafts[key]='changed since check';expect(workshopSeed(s,'js',1)).toBe(MODULE_ACTIVITIES.js.workshop.steps[0].solution);
 });

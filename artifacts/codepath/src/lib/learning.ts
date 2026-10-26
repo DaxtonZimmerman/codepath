@@ -54,3 +54,14 @@ export function nextLearningAction(s:State,onlyCourse?:string):LearningAction|nu
  }
  return null;
 }
+/** Resume from the learner's passed code even before they explicitly continue. */
+export function workshopSeed(s: State, courseId: string, index: number): string | undefined {
+ const steps = MODULE_ACTIVITIES[courseId].workshop.steps;
+ const previous = steps[index-1], current = steps[index];
+ if (!previous || !current) return undefined;
+ const key = activityKey(courseId, 'workshop', previous.id);
+ const starter = previous.challenge?.starter ?? previous.page?.starter ?? JSON.stringify(previous.files ?? {});
+ if (!taskPassed(s,key,starter)) return previous.solution;
+ const source = taskSource(s,key,starter);
+ return current.files && previous.files ? JSON.stringify({...current.files,...JSON.parse(source)}) : source;
+}
