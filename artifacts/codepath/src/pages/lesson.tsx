@@ -4,7 +4,8 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Clock } from "lucide-react";
 import { LESSONS, lessonById, trackName } from "@/lib/curriculum";
 import { actions, useStore } from "@/lib/store";
 import { prettyDate } from "@/lib/progress";
-import { CodeBlock } from "@/components/code-editor";
+import { ExamplePlayground } from "@/components/example-playground";
+import { readingQuestions } from "@/lib/learning";
 import { PageExercisePanel } from "@/components/page-exercise";
 import { courseById } from "@/lib/bootcamp";
 import { Quiz } from "@/components/quiz";
@@ -73,7 +74,7 @@ export default function LessonPage() {
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4 text-sm">
         <p>{course?.title} · {courseLessons.filter((item) => s.completed[item.id]).length}/{courseLessons.length} lessons passed</p>
-        <Link href={`/learn/${lesson.track}#project`} className="font-semibold text-primary underline underline-offset-4">Module project</Link>
+        <Link href={`/learn/${lesson.track}/workshop`} className="font-semibold text-primary underline underline-offset-4">Guided workshop</Link>
       </div>
 
       <section className="mt-10 space-y-5 text-[17px] leading-relaxed rise" style={{ animationDelay: "60ms" }}>
@@ -83,7 +84,7 @@ export default function LessonPage() {
 
       <section className="mt-8" aria-label="Example">
         <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-2">Example</p>
-        <CodeBlock code={lesson.example} />
+        <ExamplePlayground key={lesson.id} lesson={lesson} />
       </section>
 
       <section className="mt-8 rounded-2xl bg-marker/25 border border-marker p-5">
@@ -99,12 +100,19 @@ export default function LessonPage() {
         <p className="mt-3 text-xs text-muted-foreground">This lab is reviewed by you. The knowledge check below records your lesson result separately.</p>
       </section>}
 
-      <section className="mt-12" aria-labelledby="practice-h">
-        <h2 id="practice-h" className="font-display text-3xl font-extrabold mb-5">{lesson.challenge || lesson.pageExercise ? "Now you write it" : "Check your understanding"}</h2>
-        {lesson.pageExercise ? <PageExercisePanel key={lesson.id} lessonId={lesson.id} exercise={lesson.pageExercise} onResult={handle} /> : lesson.challenge
-          ? <ChallengePanel key={lesson.id} lessonId={lesson.id} challenge={lesson.challenge} onResult={handle} />
-          : <Quiz key={lesson.id} questions={lesson.quiz ?? []} onSubmit={(ok) => { actions.recordAttempt(lesson.id, ok, "quiz"); handle(ok); }} />}
+      <section className="mt-10" aria-labelledby="reading-h">
+        <p className="font-mono text-xs uppercase tracking-widest text-primary">Reading check · separate from coding practice</p>
+        <h2 id="reading-h" className="mt-2 mb-5 font-display text-2xl font-bold">Explain the idea first</h2>
+        {s.learning.readings[lesson.id] && <p className="mb-4 text-sm text-pine">✓ Reading check passed and saved. You can practise it again.</p>}
+        <Quiz key={`reading:${lesson.id}`} questions={readingQuestions(lesson.id)} onSubmit={(ok)=>{if(ok)actions.checkReading(lesson.id);if(!lesson.challenge&&!lesson.pageExercise){actions.recordAttempt(lesson.id,ok,"quiz");handle(ok);}}}/>
+        <label className="mt-6 block text-sm font-semibold">In your own words<textarea rows={3} className="mt-2 w-full rounded-xl border bg-card p-3 font-normal" placeholder="Explain the idea, predict an example, or note what still feels unclear." value={s.drafts[`reflection:${lesson.id}`]??''} onChange={e=>actions.saveDraft(`reflection:${lesson.id}`,e.target.value)}/></label>
       </section>
+      {(lesson.challenge||lesson.pageExercise)&&<section className="mt-12" aria-labelledby="practice-h">
+        <p className="font-mono text-xs uppercase tracking-widest text-primary">Coding practice</p>
+        <h2 id="practice-h" className="font-display text-3xl font-extrabold mb-5">Now you write it</h2>
+        {['js-values','js-loops','js-debugging'].includes(lesson.id)&&s.drafts[lesson.id]&&<p className="mb-4 text-sm text-muted-foreground">This exercise now teaches fundamentals before collections. Your saved draft is kept; use Reset code if it belongs to the earlier exercise.</p>}
+        {lesson.pageExercise ? <PageExercisePanel key={lesson.id} lessonId={lesson.id} exercise={lesson.pageExercise} onResult={handle} /> : <ChallengePanel key={lesson.id} lessonId={lesson.id} challenge={lesson.challenge!} onResult={handle} />}
+      </section>}
 
       {justPassed && next && (
         <Link href={`/lesson/${next.id}`} className="pop mt-8 flex items-center gap-4 rounded-2xl bg-pine text-background p-5" data-testid="link-continue">
@@ -112,11 +120,11 @@ export default function LessonPage() {
         </Link>
       )}
 
-      {justPassed && !next && <Link href={`/learn/${lesson.track}#project`} className="mt-8 flex items-center gap-3 rounded-2xl bg-pine p-5 text-background" data-testid="link-module-project"><CheckCircle2 className="size-5 shrink-0" /><div><p className="font-semibold">You passed this lesson. Put the module skills to work.</p><p className="mt-1 text-sm opacity-80">Open the project brief and review your deliverables.</p></div><ArrowRight className="ml-auto size-5 shrink-0" /></Link>}
+      {justPassed && !next && <Link href={`/learn/${lesson.track}/workshop`} className="mt-8 flex items-center gap-3 rounded-2xl bg-pine p-5 text-background" data-testid="link-module-project"><CheckCircle2 className="size-5 shrink-0" /><div><p className="font-semibold">You passed this lesson. Continue with the guided workshop.</p><p className="mt-1 text-sm opacity-80">Build a complete solution step by step, then try the independent lab.</p></div><ArrowRight className="ml-auto size-5 shrink-0" /></Link>}
 
       <nav className="mt-14 pt-6 border-t flex justify-between gap-4" aria-label="Lesson navigation">
         {prev ? <Link href={`/lesson/${prev.id}`} className="text-sm hover:text-primary flex items-center gap-1" data-testid="link-prev-lesson"><ArrowLeft className="size-4" /> {prev.title}</Link> : <span />}
-        {next ? <Link href={`/lesson/${next.id}`} className="text-sm hover:text-primary flex items-center gap-1 text-right" data-testid="link-next-lesson">{next.title} <ArrowRight className="size-4" /></Link> : <Link href={`/learn/${lesson.track}#project`} className="text-right text-sm text-primary">Open the module project <ArrowRight className="inline size-4" /></Link>}
+        {next ? <Link href={`/lesson/${next.id}`} className="text-sm hover:text-primary flex items-center gap-1 text-right" data-testid="link-next-lesson">{next.title} <ArrowRight className="size-4" /></Link> : <Link href={`/learn/${lesson.track}/workshop`} className="text-right text-sm text-primary">Continue to the workshop <ArrowRight className="inline size-4" /></Link>}
       </nav>
     </article>
   );

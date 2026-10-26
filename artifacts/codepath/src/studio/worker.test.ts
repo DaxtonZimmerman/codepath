@@ -51,3 +51,11 @@ it("rejects mutation even when the returned value matches", () => {
   const good = request({ type: "challenge", functionName: "addTag", code: "function addTag(tags, tag) { return [...tags, tag]; }", tests: structuredClone(tests) });
   expect(good[0].passed).toBe(true);
 });
+
+it("runs reading experiments through the worker with bounded console output", () => {
+  expect(request({type:"experiment",code:'console.log("hello", 3); console.warn({done:true});'})).toEqual(['hello 3','{"done":true}']);
+  expect(request({type:"experiment",code:'for(let i=0;i<200;i++) console.log(i);'})).toHaveLength(100);
+  messages.length=0;
+  scope.onmessage({data:{id:1,type:"experiment",code:'throw new Error("example failed");'}});
+  expect(messages.find(m=>m.type==='reply').error).toBe('example failed');
+});

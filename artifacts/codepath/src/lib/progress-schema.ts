@@ -1,8 +1,10 @@
 import { z } from "zod";
+import { learningSchema } from "./learning-progress";
 
 const date = z.string().refine((s) => Number.isFinite(Date.parse(s)), "Invalid date");
 export const progressSchema = z.object({
   version: z.literal(1),
+  learning: learningSchema,
   dailyGoal: z.number().int().min(1).max(8),
   completed: z.record(z.string(), date),
   attempts: z.array(z.object({ lessonId: z.string(), at: date, passed: z.boolean(), kind: z.enum(["challenge", "quiz"]) }).passthrough()),

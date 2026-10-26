@@ -1,3 +1,4 @@
+import { mergeLearning, emptyLearning } from "./learning-progress";
 import { z } from "zod";
 import { progressSchema } from "./progress-schema";
 import { getProgress, getStorageStatus, replaceProgress, downloadFile, type State } from "./store";
@@ -23,6 +24,7 @@ export function mergeProgress(current: State, imported: State): State {
   return {
     ...imported, ...current,
     completed: { ...imported.completed, ...current.completed },
+    learning: mergeLearning(current.learning ?? emptyLearning(), imported.learning ?? emptyLearning()),
     drafts: { ...imported.drafts, ...current.drafts },
     reviews: { ...imported.reviews, ...current.reviews },
     projects: { ...imported.projects, ...current.projects },

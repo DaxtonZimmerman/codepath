@@ -1,0 +1,13 @@
+import { useState } from 'react';
+import type { Lesson } from '@/lib/curriculum';
+import { actions, useStore, downloadFile } from '@/lib/store';
+import { StudioRuntime } from '@/lib/studio-runtime';
+import { pagePreview } from '@/lib/page-exercises';
+import { CodeEditor } from './code-editor';
+export function ExamplePlayground({lesson}:{lesson:Lesson}) {
+ const s=useStore();const id=`example:${lesson.id}`;const source=s.drafts[id]??lesson.example;
+ const [output,setOutput]=useState<string[]>([]),[busy,setBusy]=useState(false);
+ const js=['js','data'].includes(lesson.track);const html=lesson.track==='web'&&lesson.id.startsWith('html');const css=lesson.track==='web'&&lesson.id.startsWith('css');
+ async function run(){setBusy(true);setOutput([]);const runtime=new StudioRuntime();try{setOutput(await runtime.request<string[]>({type:'experiment',code:source}));}catch(e){setOutput([e instanceof Error?e.message:String(e)]);}finally{runtime.stop();setBusy(false);}}
+ return <div className="space-y-3"><p className="text-sm text-muted-foreground">{js?'Change the example and run it. Add console.log(...) to inspect a value. This scratchpad does not affect your lesson result.':html||css?'Edit the example and inspect its inert preview. Scripts, remote assets and form submissions are disabled.':'Edit this example as a scratchpad, then copy or download it for the module’s external tools. It is not executed here.'}</p><CodeEditor value={source} label={`Experiment with ${lesson.title}`} filename={html?'example.html':css?'example.css':js?'example.js':'example.txt'} onChange={value=>actions.saveDraft(id,value)} onRun={js?run:undefined}/>{js&&<><button disabled={busy} onClick={run} className="rounded-xl border px-4 py-3 font-semibold disabled:opacity-40">{busy?'Running…':'Run example'}</button><pre aria-label="Example output" role="status" className="max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-secondary p-4 text-sm font-mono">{output.length?output.join('\n'):'Console output appears here. A function declaration alone produces no output; call it inside console.log.'}</pre></>}{(html||css)&&<iframe sandbox="" title="Example preview" className="h-64 w-full rounded-xl border bg-white" srcDoc={pagePreview({language:html?'html':'css',prompt:'',starter:'',template:'<main><h1>Layout experiment</h1><div class="cards"><article class="card">First card</article><article class="card">Second card</article></div></main>',checks:[],hints:[]},source)}/>}<button onClick={()=>downloadFile(`codepath-${lesson.id}.${html?'html':css?'css':js?'js':'txt'}`,new Blob([source],{type:'text/plain'}))} className="block text-sm text-primary underline">Download my example</button></div>;
+}

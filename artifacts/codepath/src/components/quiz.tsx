@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Check, X, RotateCcw } from "lucide-react";
 import type { QuizQ } from "@/lib/curriculum";
+import { shuffled } from "@/lib/learning";
 import { cn } from "@/lib/utils";
 
 export function Quiz({ questions, onSubmit }: { questions: QuizQ[]; onSubmit: (allCorrect: boolean) => void }) {
-  const [picks, setPicks] = useState<(number | null)[]>(questions.map(() => null));
+  const [items] = useState(() => questions.map(q => { const order = shuffled([0,1,2,3]); return {...q, options: order.map(i=>q.options[i]), answer: order.indexOf(q.answer)}; }));
+  const [picks, setPicks] = useState<(number | null)[]>(items.map(() => null));
   const [checked, setChecked] = useState(false);
   const allPicked = picks.every((p) => p !== null);
-  const correct = picks.filter((p, i) => p === questions[i].answer).length;
+  const correct = picks.filter((p, i) => p === items[i].answer).length;
 
   return (
     <div className="space-y-6">
-      {questions.map((q, qi) => (
+      {items.map((q, qi) => (
         <fieldset key={qi} className="rounded-2xl border bg-card p-5 sm:p-6" data-testid={`quiz-question-${qi}`}>
           <legend className="sr-only">Question {qi + 1}</legend>
           <p className="font-display text-lg font-semibold mb-4"><span className="font-mono text-primary text-sm mr-2">Q{qi + 1}</span>{q.q}</p>
@@ -48,15 +50,15 @@ export function Quiz({ questions, onSubmit }: { questions: QuizQ[]; onSubmit: (a
       ))}
       <div className="flex flex-wrap items-center gap-3">
         {!checked ? (
-          <button disabled={!allPicked} onClick={() => { setChecked(true); onSubmit(correct === questions.length); }}
+          <button disabled={!allPicked} onClick={() => { setChecked(true); onSubmit(correct === items.length); }}
             className="press rounded-xl bg-foreground text-background px-6 py-3 font-semibold disabled:opacity-40" data-testid="button-check-quiz">
             Check answers
           </button>
         ) : (
           <>
-            <p className="font-display text-lg font-semibold" data-testid="text-quiz-score">{correct} of {questions.length} correct</p>
-            {correct < questions.length && (
-              <button onClick={() => { setChecked(false); setPicks(questions.map(() => null)); }} className="press inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2 font-medium" data-testid="button-retry-quiz">
+            <p className="font-display text-lg font-semibold" data-testid="text-quiz-score">{correct} of {items.length} correct</p>
+            {correct < items.length && (
+              <button onClick={() => { setChecked(false); setPicks(items.map(() => null)); }} className="press inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2 font-medium" data-testid="button-retry-quiz">
                 <RotateCcw className="size-4" /> Try again
               </button>
             )}

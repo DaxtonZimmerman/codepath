@@ -101,36 +101,34 @@ totalWithTax(20); // 21.6`,
     },
   },
   {
-    id: "js-loops", track: "js", title: "Decisions and loops", minutes: 12,
-    summary: "if/else chains, the modulo operator, and building arrays in loops.",
+    id: "js-loops", track: "js", title: "Repeat work with loops", minutes: 12,
+    summary: "Repeat a calculation with a counter and a running total.",
     body: [
-      "The remainder operator % tells you whether a number divides evenly: n % 3 === 0 means n is a multiple of 3.",
-      "Order matters in if/else chains. Check the most specific condition first, otherwise a broader branch will catch it early.",
-      "A for loop with an index lets you build up a result array with push and return it at the end.",
+      "A for loop has an initializer, a condition and an update. for (let i = 1; i <= n; i++) starts at one, includes n and increments after each iteration.",
+      "Use let for a counter or total that changes. Declare the total before the loop, update it inside, then return after the loop has finished.",
+      "Check zero, one and a normal input. An inclusive <= boundary differs from <. The remainder operator % lets i % 2 === 0 identify even numbers. Make sure your counter changes toward a false condition so the loop stops. Arrays are introduced in the next module; this exercise uses one numeric total."
     ],
-    example: `function evensUpTo(n) {
-  const out = [];
+    example: `function sumUpTo(n) {
+  let total = 0;
   for (let i = 1; i <= n; i++) {
-    if (i % 2 === 0) out.push(i);
+    total += i;
   }
-  return out;
-}`,
-    takeaways: ["Check specific cases before general ones", "% gives the remainder", "Accumulate into an array, then return it"],
+  return total;
+}
+console.log(sumUpTo(3)); // 6`,
+    takeaways: ["Initialize before repeating", "Check the inclusive boundary", "Update the counter so the loop stops"],
     challenge: {
-      functionName: "fizzBuzz", concept: "Loops & conditionals",
-      prompt: "Return an array from 1 to n where multiples of 3 are \"Fizz\", multiples of 5 are \"Buzz\", multiples of both are \"FizzBuzz\", and other numbers stay numbers.",
-      starter: `function fizzBuzz(n) {\n  const result = [];\n  // loop from 1 to n\n  return result;\n}\n`,
+      functionName: "sumEvenUpTo", concept: "Loops and conditions",
+      prompt: "Return the sum of even integers from 1 through n, inclusive. Inputs are nonnegative integers. For zero return 0.",
+      starter: `function sumEvenUpTo(n) {\n  let total = 0;\n  // Add the even numbers, then return total.\n}`,
       tests: [
-        { args: [5], expected: [1, 2, "Fizz", 4, "Buzz"], label: "n = 5" },
-        { args: [15], expected: [1, 2, "Fizz", 4, "Buzz", "Fizz", 7, 8, "Fizz", "Buzz", 11, "Fizz", 13, 14, "FizzBuzz"], label: "n = 15 includes FizzBuzz" },
-        { args: [0], expected: [], label: "n = 0 is empty" },
+        { args: [6], expected: 12, label: "2 + 4 + 6 = 12" },
+        { args: [5], expected: 6, label: "Odd upper bound" },
+        { args: [2], expected: 2, label: "Inclusive boundary" },
+        { args: [0], expected: 0, label: "Zero has no positive terms" }
       ],
-      hints: [
-        "Loop with for (let i = 1; i <= n; i++) and push one value per iteration.",
-        "Check i % 15 === 0 (or both 3 and 5) before checking 3 or 5 alone.",
-        "Numbers that are not multiples should be pushed as numbers, not strings: result.push(i).",
-      ],
-    },
+      hints: ["Loop from 1 through n.", "i % 2 === 0 identifies an even number.", "Add to total inside the condition and return after the loop."]
+    }
   },
   {
     id: "array-methods", track: "data", title: "map, filter, reduce", minutes: 12,

@@ -91,6 +91,11 @@ self.onmessage = ({ data }) => {
       send({ type: "reply", id, result: inspect() });
     } else if (data.type === "inspect") {
       send({ type: "reply", id, result: inspect() });
+    } else if (data.type === "experiment") {
+      const output: string[] = [];
+      const consoleProxy = Object.fromEntries(["log", "info", "warn", "error", "debug"].map(level => [level, (...args: unknown[]) => { if (output.length < 100) output.push(args.map(text).join(" ").slice(0,4000)); }]));
+      new Function("console", `${data.code}\n//# sourceURL=reading-example.js`)(consoleProxy);
+      send({ type: "reply", id, result: output });
     } else if (data.type === "challenge") {
       const { code, functionName, tests } = data;
       if (!/^[A-Za-z_$][\w$]*$/.test(functionName)) throw new Error("Invalid function name.");

@@ -60,7 +60,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "summary": "Make content easy to scan and navigation easy to understand.",
     "body": [
       "Headings form an outline. Use h1 for the page, then h2 for its sections. A paragraph groups a thought; a br element is a line break, not a layout tool.",
-      "An anchor navigates to an href. Descriptive text such as “Read the project notes” is more useful than “click here.” Use a button when an action changes the current page.",
+      "An anchor navigates to an href. Descriptive text such as \u201cRead the project notes\u201d is more useful than \u201cclick here.\u201d Use a button when an action changes the current page.",
       "An address beginning with https:// is an absolute URL. A URL such as /projects is relative to a site. A fragment such as #contact points to an element whose id is contact."
     ],
     "example": "<section id=\"work\">\n  <h2>My work</h2>\n  <p>See <a href=\"https://example.com\">my project notes</a>.</p>\n</section>",
@@ -113,7 +113,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "minutes": 20,
     "summary": "Describe meaningful images and group related items.",
     "body": [
-      "An img element is a void element: it does not wrap content or need a closing tag. Its src chooses a file and alt provides a text alternative. Describe the image’s purpose in context; decorative images use alt=\"\".",
+      "An img element is a void element: it does not wrap content or need a closing tag. Its src chooses a file and alt provides a text alternative. Describe the image\u2019s purpose in context; decorative images use alt=\"\".",
       "Use ul for items whose order does not matter and ol for ordered steps. Each item belongs in an li. A list provides structure that a row of paragraphs does not.",
       "Write the alternative text even when a preview cannot load the image. Codepath blocks external images in lesson previews, so this exercise checks your markup rather than downloading a file."
     ],
@@ -165,7 +165,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "body": [
       "A form groups inputs for a task. The name attribute identifies a field when a form is submitted; the id connects it to a visible label. A placeholder is a hint, not a replacement for a label.",
       "Choose an input type for the data. type=\"email\" enables browser email checks, and required prevents an empty field. You still validate on a real server because browser checks can be bypassed.",
-      "Use a submit button and handle a form’s submit event when building an interactive app. In this markup exercise, create the structure first. The preview blocks network submission."
+      "Use a submit button and handle a form\u2019s submit event when building an interactive app. In this markup exercise, create the structure first. The preview blocks network submission."
     ],
     "example": "<form>\n  <label for=\"email\">Email address</label>\n  <input id=\"email\" name=\"email\" type=\"email\" required>\n  <button type=\"submit\">Join</button>\n</form>",
     "takeaways": [
@@ -276,7 +276,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "body": [
       "A responsive page changes with the available space. Start with a usable single column, then add columns when there is room. Avoid a fixed page width that is wider than a phone.",
       "A media query applies rules only when its condition matches. @media (min-width: 700px) can switch a card group from one column to two. The breakpoint belongs to your content, not to a specific phone model.",
-      "Grid’s minmax(0, 1fr) lets a column shrink below its content’s preferred width. Check long text, zoom, keyboard focus, and a narrow viewport rather than trusting a single screenshot."
+      "Grid\u2019s minmax(0, 1fr) lets a column shrink below its content\u2019s preferred width. Check long text, zoom, keyboard focus, and a narrow viewport rather than trusting a single screenshot."
     ],
     "example": ".cards { display: grid; grid-template-columns: 1fr; gap: 16px; }\n@media (min-width: 700px) {\n  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }\n}",
     "takeaways": [
@@ -332,51 +332,50 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "track": "js",
     "title": "Values, variables, and return",
     "minutes": 15,
-    "summary": "Store useful information and return a result from a function.",
+    "summary": "Store useful information and return a simple text result.",
     "body": [
-      "JavaScript works with values such as numbers, strings, booleans, null, and undefined. A variable binds a name to a value. Use const when you will not reassign that binding.",
-      "A function receives arguments through its parameters. return sends a value to the caller and ends that function call. console.log displays a message but does not return the message.",
-      "Begin by running a function with a normal input and an edge case. Here you will return an object so a page can use the name and role separately."
+      "JavaScript works with values such as strings, numbers and booleans. Quotes make text a string. typeof reports a value\u2019s runtime type: typeof \"42\" is \"string\". const binds a name to a value when you will not reassign that name.",
+      "A function receives values through named parameters. return sends a result to the caller. console.log displays a message; it does not provide a return value to the caller.",
+      "Start with a string before learning collections. The + operator joins strings: \"Hello, \" + name. Call your function with an ordinary name and an empty string. Objects and arrays come in the next module."
     ],
-    "example": "function makeLabel(name) {\n  return { name: name, active: true };\n}",
+    "example": "function greet(name) {\n  const greeting = \"Hello, \" + name;\n  return greeting;\n}\nconsole.log(greet(\"Daxton\"));",
     "takeaways": [
-      "Values have types",
-      "Parameters name the inputs",
+      "Quoted values are strings",
+      "Parameters name inputs",
       "return produces the output"
     ],
     "challenge": {
-      "functionName": "makeProfile",
-      "concept": "Values, variables, and return",
-      "prompt": "Return an object with name and role from the two arguments. Do not log the object instead of returning it.",
-      "starter": "function makeProfile(name, role) {\n  // Write your solution here.\n}\n",
+      "functionName": "makeGreeting",
+      "concept": "Values and return",
+      "prompt": "Return \"Hello, \" followed by the name argument and \"!\". For an empty name return \"Hello, !\". Return the text instead of only logging it.",
+      "starter": "function makeGreeting(name) {\n  // Return your greeting string.\n}",
       "tests": [
         {
           "args": [
-            "Daxton",
-            "Developer"
+            "Daxton"
           ],
-          "expected": {
-            "name": "Daxton",
-            "role": "Developer"
-          },
-          "label": "keeps both values"
+          "expected": "Hello, Daxton!",
+          "label": "Greet Daxton"
         },
         {
           "args": [
-            "",
-            "Student"
+            "Ada"
           ],
-          "expected": {
-            "name": "",
-            "role": "Student"
-          },
-          "label": "allows an empty name"
+          "expected": "Hello, Ada!",
+          "label": "Use the supplied name"
+        },
+        {
+          "args": [
+            ""
+          ],
+          "expected": "Hello, !",
+          "label": "An empty string still works"
         }
       ],
       "hints": [
-        "Return an object using braces.",
-        "The keys must be name and role.",
-        "return { name: name, role: role };"
+        "Join the fixed text and the parameter.",
+        "Use + or a template literal.",
+        "Return the entire string including the final exclamation mark."
       ]
     }
   },
@@ -606,53 +605,60 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "body": [
       "A syntax error prevents code from being parsed. A runtime error happens while it executes. A logic error runs successfully but produces the wrong answer.",
       "Read the error message and the first relevant line of the stack. Reproduce the failure with the smallest input. Inspect values near the point where the actual result diverges from your expectation.",
-      "Write down the expected output before changing code. For a function that sums values, include an empty list and negative numbers so a fix does not only handle the example you first noticed."
+      "Write down expected outputs before changing code. A score clamp should return 0 below zero, 100 above one hundred, and the original number in between. Test both boundaries and an ordinary value so a fix handles more than one example."
     ],
-    "example": "// Bug: return inside the loop stops after one item.\nfunction brokenSum(values) {\n  for (const value of values) return value;\n}",
+    "example": "// Bug: the upper boundary is handled but the lower one is not.\nfunction clampScore(score) {\n  if (score > 100) return 100;\n  return score;\n}\nconsole.log(clampScore(-1)); // Should be 0",
     "takeaways": [
       "Distinguish error categories",
       "Reproduce with a small input",
       "Test the fix against boundaries"
     ],
     "challenge": {
-      "functionName": "sumNumbers",
-      "concept": "Debugging and reading errors",
-      "prompt": "Return the sum of every number in values. An empty array returns 0.",
-      "starter": "function sumNumbers(values) {\n  // Write your solution here.\n}\n",
+      "functionName": "clampScore",
+      "concept": "Debugging boundary rules",
+      "prompt": "Repair clampScore(score). Return 0 for numbers below 0, 100 for numbers above 100, and score otherwise. All inputs are finite numbers.",
+      "starter": "function clampScore(score) {\n  if (score > 100) return 100;\n  // Fix the missing lower boundary.\n  return score;\n}",
       "tests": [
         {
           "args": [
-            [
-              2,
-              3,
-              4
-            ]
+            50
           ],
-          "expected": 9,
-          "label": "sums all items"
+          "expected": 50,
+          "label": "Ordinary score"
         },
         {
           "args": [
-            []
+            -1
           ],
           "expected": 0,
-          "label": "empty input"
+          "label": "Below lower boundary"
         },
         {
           "args": [
-            [
-              -2,
-              5
-            ]
+            0
           ],
-          "expected": 3,
-          "label": "negative numbers"
+          "expected": 0,
+          "label": "At lower boundary"
+        },
+        {
+          "args": [
+            100
+          ],
+          "expected": 100,
+          "label": "At upper boundary"
+        },
+        {
+          "args": [
+            101
+          ],
+          "expected": 100,
+          "label": "Above upper boundary"
         }
       ],
       "hints": [
-        "Start total at 0 before looping.",
-        "Update the total for each item.",
-        "Return only after the loop has finished."
+        "Reproduce the negative-input failure first.",
+        "Check score < 0 before returning an ordinary score.",
+        "Keep both the low and high boundary rules."
       ]
     }
   },
@@ -863,7 +869,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "innerHTML",
           "textContent",
-          "outerHTML"
+          "outerHTML",
+          "document.write"
         ],
         "answer": 1,
         "explanation": "textContent treats the title as text instead of parsing it as HTML."
@@ -873,7 +880,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "The current application state",
           "Only the initial HTML",
-          "A random copy of old data"
+          "A random copy of old data",
+          "Only the button\u2019s current background color"
         ],
         "answer": 0,
         "explanation": "Render the current state so UI updates reflect the latest data."
@@ -887,7 +895,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "minutes": 15,
     "summary": "Handle a complete user action rather than one particular click.",
     "body": [
-      "A form can be submitted by clicking its submit button or pressing Enter in a field. Listen for submit on the form so both paths work. preventDefault stops the browser’s normal navigation when your JavaScript handles the action.",
+      "A form can be submitted by clicking its submit button or pressing Enter in a field. Listen for submit on the form so both paths work. preventDefault stops the browser\u2019s normal navigation when your JavaScript handles the action.",
       "Read the values, validate them, and return early when they are invalid. Show a specific message beside the relevant field and connect it with aria-describedby. Do not erase valid fields after an error.",
       "After a successful save, update your model, render it, and reset the form if that fits the workflow. Give people visible confirmation, and keep keyboard focus somewhere useful."
     ],
@@ -903,7 +911,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "It also handles keyboard submission",
           "It disables validation",
-          "It runs on every keystroke"
+          "It runs on every keystroke",
+          "It runs only when the page first loads"
         ],
         "answer": 0,
         "explanation": "The form event represents the action regardless of how the user submits."
@@ -913,7 +922,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Clear every field",
           "Save anyway",
-          "Explain the problem and preserve useful input"
+          "Explain the problem and preserve useful input",
+          "Replace the error with a success message"
         ],
         "answer": 2,
         "explanation": "Specific feedback helps people correct the input without repeating their work."
@@ -929,7 +939,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "body": [
       "localStorage stores strings under keys. JSON.stringify converts suitable JavaScript values to a string; JSON.parse reads them back. Parsing invalid JSON throws an error.",
       "Reading storage can fail or return data from an older app version. Wrap storage access and parsing in try/catch, validate the shape, and offer a fallback rather than crashing the page.",
-      "This exercise builds the pure parsing part. The runner does not expose the browser’s storage. In your module project, call this helper with the string returned by localStorage.getItem."
+      "This exercise builds the pure parsing part. The runner does not expose the browser\u2019s storage. In your module project, call this helper with the string returned by localStorage.getItem."
     ],
     "example": "let tasks = [];\ntry {\n  const saved = JSON.parse(raw);\n  if (Array.isArray(saved)) tasks = saved;\n} catch { /* Keep the safe fallback. */ }",
     "takeaways": [
@@ -1005,7 +1015,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "A useful empty-result message",
           "A network error",
-          "An endless spinner"
+          "An endless spinner",
+          "Old unrelated results without explanation"
         ],
         "answer": 0,
         "explanation": "An empty successful result is different from a failure."
@@ -1015,7 +1026,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "A payment write",
           "A read-only GET",
-          "Any write repeated forever"
+          "Any write repeated forever",
+          "A delete operation without duplicate protection"
         ],
         "answer": 1,
         "explanation": "Reading is a safer retry exercise; writes need duplicate-handling rules."
@@ -1045,7 +1057,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "The first, because it started earlier",
           "The response for the latest search",
-          "Both merged without a rule"
+          "Both merged without a rule",
+          "Whichever response has the largest payload"
         ],
         "answer": 1,
         "explanation": "The interface should reflect the latest request the person made."
@@ -1055,7 +1068,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "A signal for cancellation",
           "A database transaction",
-          "A guaranteed faster response"
+          "A guaranteed faster response",
+          "Automatic response caching forever"
         ],
         "answer": 0,
         "explanation": "Pass controller.signal in fetch options and call controller.abort when needed."
@@ -1071,13 +1085,13 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "body": [
       "The terminal runs commands in a current directory. pwd shows that location; ls lists its contents. cd changes directories. A relative path is interpreted from the current directory.",
       "Quote a path containing spaces, such as cd \"Web Dev/Codepath\". Read a command before running it, especially one that deletes files or changes many paths. Use your editor to inspect changes afterward.",
-      "A package manager reads package.json scripts and installs dependencies. Run a project’s documented commands from its root folder. Keeping the lockfile in Git helps teammates install the same dependency versions."
+      "A package manager reads package.json scripts and installs dependencies. Run a project\u2019s documented commands from its root folder. Keeping the lockfile in Git helps teammates install the same dependency versions."
     ],
     "example": "pwd\nls\ncd \"Web Dev/Codepath\"\npnpm dev",
     "takeaways": [
       "Know your current directory",
       "Quote paths containing spaces",
-      "Follow the project’s setup instructions"
+      "Follow the project\u2019s setup instructions"
     ],
     "quiz": [
       {
@@ -1085,7 +1099,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "The current directory",
           "Your Git password",
-          "Every dependency"
+          "Every dependency",
+          "The last commit message"
         ],
         "answer": 0,
         "explanation": "pwd helps you verify where a command will run."
@@ -1095,7 +1110,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "It stores your account password",
           "It records resolved dependency versions",
-          "It replaces source code"
+          "It replaces source code",
+          "It runs the app without dependencies"
         ],
         "answer": 1,
         "explanation": "A lockfile makes dependency installation more reproducible."
@@ -1134,7 +1150,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "git diff --staged",
           "git log only",
-          "git switch main"
+          "git switch main",
+          "git status --short only"
         ],
         "answer": 0,
         "explanation": "Staged changes are the changes included in the next commit."
@@ -1144,7 +1161,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Always delete one file",
           "Understand and combine the intended changes",
-          "Commit the conflict markers"
+          "Commit the conflict markers",
+          "Publish the unresolved markers as working code"
         ],
         "answer": 1,
         "explanation": "Resolve the actual behavior, then verify the result."
@@ -1183,7 +1201,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "git fetch",
           "git commit",
-          "git add"
+          "git add",
+          "git merge"
         ],
         "answer": 0,
         "explanation": "fetch updates your remote references; integration is a separate choice."
@@ -1191,9 +1210,10 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
       {
         "q": "What belongs in a useful pull request description?",
         "options": [
-          "Only “done”",
+          "Only \u201cdone\u201d",
           "The problem, changed behavior, and verification",
-          "An access token"
+          "An access token",
+          "A secret stored in a screenshot"
         ],
         "answer": 1,
         "explanation": "A reviewer needs enough context to judge the change."
@@ -1202,7 +1222,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "lab": {
       "task": "Publish a project repository",
       "steps": [
-        "Add a README with setup steps and the project’s purpose.",
+        "Add a README with setup steps and the project\u2019s purpose.",
         "Push a focused branch and open a pull request.",
         "Check the diff and any automated checks before merging."
       ],
@@ -1232,7 +1252,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Checking result.status",
           "Adding any",
-          "Changing indentation"
+          "Changing indentation",
+          "Renaming Result to Data"
         ],
         "answer": 0,
         "explanation": "The discriminant identifies which properties are available."
@@ -1242,14 +1263,15 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Yes, always",
           "Only in production",
-          "No"
+          "No",
+          "Only when strict mode is enabled"
         ],
         "answer": 2,
         "explanation": "TypeScript types are erased; validate untrusted runtime values separately."
       }
     ],
     "lab": {
-      "task": "Model your app’s request state",
+      "task": "Model your app\u2019s request state",
       "steps": [
         "Define a discriminated union for loading, success, and error.",
         "Write a function that returns a label for each state.",
@@ -1266,7 +1288,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "summary": "Write down the shape a component or helper expects.",
     "body": [
       "An object type describes property names and their value types. An optional property uses ?, meaning it may be undefined. A readonly property signals that code should not reassign it through that type.",
-      "A function’s parameter and return types form a contract. Keep the contract close to what the function needs rather than requiring a huge object with unrelated fields.",
+      "A function\u2019s parameter and return types form a contract. Keep the contract close to what the function needs rather than requiring a huge object with unrelated fields.",
       "When an API changes, a narrow view model can protect the rest of your UI. Validate the response at the boundary and transform it into the stable shape your components consume."
     ],
     "example": "type Product = { id: number; name: string; priceCents: number; note?: string };\nfunction label(product: Product): string {\n  return `${product.name}: ${product.priceCents} cents`;\n}",
@@ -1281,7 +1303,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Only string",
           "string or undefined",
-          "Only null"
+          "Only null",
+          "It is always a boolean"
         ],
         "answer": 1,
         "explanation": "An optional property may be absent, so undefined must be considered."
@@ -1291,7 +1314,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Those two required fields",
           "Every field from the database",
-          "any"
+          "any",
+          "Require every unrelated server field"
         ],
         "answer": 0,
         "explanation": "A small explicit contract limits unnecessary coupling."
@@ -1330,7 +1354,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "number",
           "string | undefined",
-          "any always"
+          "any always",
+          "number | undefined"
         ],
         "answer": 1,
         "explanation": "The element type is string, while an empty array can still produce undefined."
@@ -1340,7 +1365,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "The required capabilities of the type",
           "An automatic database index",
-          "A runtime security check"
+          "A runtime security check",
+          "The exact runtime value of every argument"
         ],
         "answer": 0,
         "explanation": "A constraint lets the implementation safely use specified properties or operations."
@@ -1379,7 +1405,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "productcard",
           "ProductCard",
-          "div"
+          "div",
+          "<tasklist>"
         ],
         "answer": 1,
         "explanation": "Capitalization distinguishes a component from a built-in tag."
@@ -1389,7 +1416,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Math.random() each render",
           "The same value for every item",
-          "A stable unique product ID"
+          "A stable unique product ID",
+          "Generate a different random key on every render"
         ],
         "answer": 2,
         "explanation": "A stable key lets React track an item across updates."
@@ -1428,7 +1456,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Mutate props",
           "Call a supplied callback",
-          "Query the parent’s DOM"
+          "Query the parent\u2019s DOM",
+          "Mutate the parent\u2019s props directly"
         ],
         "answer": 1,
         "explanation": "A callback communicates intent while the owner controls the state update."
@@ -1438,7 +1467,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "In their shared parent",
           "In two unrelated copies",
-          "In a random global variable"
+          "In a random global variable",
+          "Unrelated independent copies with no synchronization"
         ],
         "answer": 0,
         "explanation": "A shared owner keeps both components consistent."
@@ -1477,7 +1507,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "A browser event subscription",
           "A list filtered from current props and state",
-          "An external connection"
+          "An external connection",
+          "Synchronizing an external event subscription"
         ],
         "answer": 1,
         "explanation": "A filtered list is derived during rendering rather than synchronized separately."
@@ -1487,7 +1518,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "A cleanup function",
           "A JSX element",
-          "A random number"
+          "A random number",
+          "Add the same subscription again"
         ],
         "answer": 0,
         "explanation": "Cleanup removes the old subscription when appropriate."
@@ -1522,21 +1554,23 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     ],
     "quiz": [
       {
-        "q": "What updates a controlled text input’s state?",
+        "q": "What updates a controlled text input\u2019s state?",
         "options": [
           "onChange",
           "A random DOM mutation",
-          "Only a browser refresh"
+          "Only a browser refresh",
+          "Only a defaultValue with no state update"
         ],
         "answer": 0,
         "explanation": "onChange reports the new value to the state setter."
       },
       {
-        "q": "A save fails. What should happen to the user’s text?",
+        "q": "A save fails. What should happen to the user\u2019s text?",
         "options": [
           "Always erase it",
           "Preserve it and explain the failure",
-          "Replace it with undefined"
+          "Replace it with undefined",
+          "Discard the draft and report success"
         ],
         "answer": 1,
         "explanation": "Keeping valid input makes retrying possible without retyping."
@@ -1575,7 +1609,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "201",
           "404",
-          "500"
+          "500",
+          "401"
         ],
         "answer": 0,
         "explanation": "201 Created communicates that a new resource was created."
@@ -1585,7 +1620,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "The filename alone",
           "Content-Type: application/json",
-          "The button text"
+          "The button text",
+          "An executable JavaScript function sent directly over HTTP"
         ],
         "answer": 1,
         "explanation": "The header identifies how to interpret the response body."
@@ -1594,9 +1630,9 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "lab": {
       "task": "Inspect a real request",
       "steps": [
-        "Open your browser’s Network panel.",
-        "Load a page and inspect one request’s method, status, and content type.",
-        "Compare its response with the page’s visible state."
+        "Open your browser\u2019s Network panel.",
+        "Load a page and inspect one request\u2019s method, status, and content type.",
+        "Compare its response with the page\u2019s visible state."
       ],
       "verify": "You can explain which request supplied the data and what would indicate failure."
     }
@@ -1612,7 +1648,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
       "Use a consistent error response shape and a suitable status such as 400 for invalid input. Explain the field error without returning a stack trace or database internals to the client.",
       "Validate an allowlist of writable fields instead of copying a whole request object onto a database record. Ownership and permission checks are separate from checking whether a field is a valid string."
     ],
-    "example": "app.post(\"/api/tasks\", (req, res) => {\n  const title = req.body?.title;\n  if (typeof title !== \"string\" || !title.trim() || title.length > 160) {\n    return res.status(400).json({ error: \"Enter a title of 1–160 characters.\" });\n  }\n  // Save the validated title, then return 201.\n});",
+    "example": "app.post(\"/api/tasks\", (req, res) => {\n  const title = req.body?.title;\n  if (typeof title !== \"string\" || !title.trim() || title.length > 160) {\n    return res.status(400).json({ error: \"Enter a title of 1\u2013160 characters.\" });\n  }\n  // Save the validated title, then return 201.\n});",
     "takeaways": [
       "Validate at the server boundary",
       "Return consistent safe errors",
@@ -1624,17 +1660,19 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Only in the form",
           "On the server",
-          "Only in CSS"
+          "Only in CSS",
+          "Only after the record is already saved"
         ],
         "answer": 1,
         "explanation": "The server receives requests from clients that may skip the UI."
       },
       {
-        "q": "A valid title is submitted for another user’s task. Is validation sufficient?",
+        "q": "A valid title is submitted for another user\u2019s task. Is validation sufficient?",
         "options": [
           "Yes",
           "No, ownership also needs checking",
-          "Only if the title is short"
+          "Only if the title is short",
+          "Yes, if the button was hidden in the UI"
         ],
         "answer": 1,
         "explanation": "Valid data and permission to change a record are different requirements."
@@ -1659,7 +1697,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "body": [
       "Authentication establishes an identity. Authorization decides whether that identity may perform a particular action on a particular resource. Being signed in does not grant access to every record.",
       "Use a maintained authentication solution and established password hashing rather than inventing password storage or cryptography. Session cookies commonly use HttpOnly, Secure, and an appropriate SameSite setting; the overall design still needs CSRF protection appropriate to the app.",
-      "Check ownership on the server for reads and writes. Never trust a client-supplied user ID as proof of identity. Test that one account cannot read or modify another account’s private task."
+      "Check ownership on the server for reads and writes. Never trust a client-supplied user ID as proof of identity. Test that one account cannot read or modify another account\u2019s private task."
     ],
     "example": "// After trusted authentication middleware:\nconst task = await findTask(req.params.id);\nif (!task || task.ownerId !== req.user.id) {\n  return res.status(404).json({ error: \"Task not found\" });\n}",
     "takeaways": [
@@ -1673,17 +1711,19 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Deciding what an identity may access",
           "Checking a CSS property",
-          "Only asking for a username"
+          "Only asking for a username",
+          "The order of SQL rows"
         ],
         "answer": 0,
         "explanation": "Authorization enforces permission to act on a resource."
       },
       {
-        "q": "Can a request body’s userId prove who is signed in?",
+        "q": "Can a request body\u2019s userId prove who is signed in?",
         "options": [
           "Yes",
           "No",
-          "Only if it is a number"
+          "Only if it is a number",
+          "Only if the browser input is hidden"
         ],
         "answer": 1,
         "explanation": "Client input is not a trusted authentication identity."
@@ -1696,7 +1736,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "Create a task as one account.",
         "Try reading and modifying it as the other account."
       ],
-      "verify": "The second account cannot access the first account’s private task."
+      "verify": "The second account cannot access the first account\u2019s private task."
     }
   },
   {
@@ -1722,7 +1762,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "A unique identity for each row",
           "A page title",
-          "Automatic ownership checks"
+          "Automatic ownership checks",
+          "Automatic encryption of every column"
         ],
         "answer": 0,
         "explanation": "A primary key uniquely identifies a row; permissions still need application rules."
@@ -1732,7 +1773,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "As a foreign key",
           "As CSS inheritance",
-          "As a JavaScript closure"
+          "As a JavaScript closure",
+          "As an HTTP status code"
         ],
         "answer": 0,
         "explanation": "A foreign key represents and constrains the relationship."
@@ -1771,7 +1813,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "INNER JOIN only",
           "LEFT JOIN from users",
-          "No join can do this"
+          "No join can do this",
+          "CROSS JOIN without an ownership condition"
         ],
         "answer": 1,
         "explanation": "LEFT JOIN preserves the left-side row even without a matching task."
@@ -1781,7 +1824,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "String concatenation",
           "A query parameter",
-          "A copied script tag"
+          "A copied script tag",
+          "An interpolated raw SQL fragment"
         ],
         "answer": 1,
         "explanation": "Parameterized values prevent them from being interpreted as SQL syntax."
@@ -1820,7 +1864,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Keeping related writes consistent",
           "Styling a table",
-          "Skipping input validation"
+          "Skipping input validation",
+          "Sorting a CSS grid"
         ],
         "answer": 0,
         "explanation": "Related changes should commit together or roll back together."
@@ -1830,7 +1875,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Only an empty database",
           "Existing data from the earlier schema",
-          "Only screenshots"
+          "Only screenshots",
+          "Only the README\u2019s heading"
         ],
         "answer": 1,
         "explanation": "Existing rows often expose schema-change problems an empty database misses."
@@ -1854,13 +1900,13 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "summary": "Turn a vague rule into a set of cases that expose mistakes.",
     "body": [
       "A happy-path example shows intended use, but boundary cases test exactly where behavior changes. Include values just below, at, and just above a threshold.",
-      "Choose examples from the rule rather than copying the implementation’s branches. A test should explain what matters to the caller so it remains useful after a refactor.",
+      "Choose examples from the rule rather than copying the implementation\u2019s branches. A test should explain what matters to the caller so it remains useful after a refactor.",
       "Here the business rule is free shipping at 5000 cents or more. A total of 4999, exactly 5000, and 5001 test the important boundary."
     ],
     "example": "// Useful examples for a minimum rule:\n// below the threshold, exactly at it, above it.",
     "takeaways": [
       "Test where behavior changes",
-      "Express rules from the caller’s view",
+      "Express rules from the caller\u2019s view",
       "Keep tests useful across refactors"
     ],
     "challenge": {
@@ -1928,7 +1974,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "The task appears and survives refresh",
           "A private helper has a particular name",
-          "A source file has exactly 100 lines"
+          "A source file has exactly 100 lines",
+          "The add button has one exact private class name"
         ],
         "answer": 0,
         "explanation": "Assert the outcome a person relies on."
@@ -1938,10 +1985,11 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "To make tests independent and repeatable",
           "To hide failures",
-          "To make screenshots identical by chance"
+          "To make screenshots identical by chance",
+          "To make tests depend on production users"
         ],
         "answer": 0,
-        "explanation": "Predictable setup prevents one test from depending on another test’s leftovers."
+        "explanation": "Predictable setup prevents one test from depending on another test\u2019s leftovers."
       }
     ],
     "lab": {
@@ -1977,7 +2025,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Before the fix, for the reported behavior",
           "Never",
-          "Only after deployment"
+          "Only after deployment",
+          "Only for an unrelated behavior"
         ],
         "answer": 0,
         "explanation": "A meaningful failing test demonstrates that it captures the original problem."
@@ -1987,7 +2036,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Every possible behavior is correct",
           "The exercised checks passed",
-          "No future bug is possible"
+          "No future bug is possible",
+          "That the application requires no further review"
         ],
         "answer": 1,
         "explanation": "Tests provide bounded evidence about the cases they cover."
@@ -2026,7 +2076,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "The production build output",
           "node_modules",
-          "Only package.json"
+          "Only package.json",
+          "A directory of private server environment files"
         ],
         "answer": 0,
         "explanation": "The browser needs the generated assets and entry document."
@@ -2036,7 +2087,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Yes",
           "No",
-          "Only if the variable name is long"
+          "Only if the variable name is long",
+          "Only if the app uses TypeScript"
         ],
         "answer": 1,
         "explanation": "Anything delivered to the browser is available to its users."
@@ -2075,7 +2127,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Whether the interaction makes sense with a keyboard",
           "Whether a file exists",
-          "Whether 2 + 2 is 4"
+          "Whether 2 + 2 is 4",
+          "Whether a static file has a particular byte count"
         ],
         "answer": 0,
         "explanation": "Keyboard behavior and task clarity need hands-on use."
@@ -2085,7 +2138,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "A visible label",
           "The submit button",
-          "Neither; it is only an optional hint"
+          "Neither; it is only an optional hint",
+          "All error messages"
         ],
         "answer": 2,
         "explanation": "A placeholder disappears during typing and is not a reliable label."
@@ -2094,7 +2148,7 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
     "lab": {
       "task": "Review the primary flow before release",
       "steps": [
-        "Complete the app’s main task without a mouse.",
+        "Complete the app\u2019s main task without a mouse.",
         "Zoom to 200% and test a narrow viewport.",
         "Fix missing labels, hidden focus, or unreachable controls."
       ],
@@ -2124,7 +2178,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Its filename looks correct",
           "A successful restore test",
-          "It was never opened"
+          "It was never opened",
+          "The backup file is large"
         ],
         "answer": 1,
         "explanation": "A restore verifies that the saved data can actually be recovered."
@@ -2134,7 +2189,8 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
         "options": [
           "Only a screenshot",
           "Your contribution, decisions, evidence, and limits",
-          "Claims that no bugs can exist"
+          "Claims that no bugs can exist",
+          "Only a list of technology logos"
         ],
         "answer": 1,
         "explanation": "Concrete evidence and clear attribution make the work understandable."
@@ -2154,12 +2210,12 @@ export const BOOTCAMP_LESSONS: Lesson[] = [
 
 // Trusted reference implementations used only by curriculum regression tests.
 export const REFERENCE_SOLUTIONS: Record<string, string> = {
-  "js-values": "function makeProfile(name, role) { return { name, role }; }",
+  "js-values": "function makeGreeting(name) { return 'Hello, ' + name + '!'; }",
   "js-numbers": "function lineTotal(priceCents, quantity) { return priceCents * quantity; }",
   "js-strings": "function normalizeSearch(text) { return text.trim().toLowerCase(); }",
   "js-conditions": "function canEnroll(age, hasConsent) { return age >= 18 && hasConsent === true; }",
   "js-scope": "function applyDiscount(price, discount) { return Math.max(0, price - discount); }",
-  "js-debugging": "function sumNumbers(values) { let total=0; for (const value of values) total+=value; return total; }",
+  "js-debugging": "function clampScore(score) { return Math.max(0, Math.min(100,score)); }",
   "arrays-basics": "function lastItem(items) { return items.length ? items[items.length - 1] : null; }",
   "object-basics": "function displayName(user) { return user.nickname ?? user.name; }",
   "data-immutable": "function addTag(tags, tag) { return [...tags, tag]; }",

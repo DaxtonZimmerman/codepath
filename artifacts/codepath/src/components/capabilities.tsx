@@ -17,10 +17,10 @@ export function Capabilities() {
   }
   return (
     <section className="mb-12 rounded-3xl border-2 border-foreground/80 bg-card p-5 sm:p-7" aria-labelledby="cap-h" data-testid="section-capabilities">
-      <h2 id="cap-h" className="font-display text-xl font-bold">What you can do now</h2>
+      <h2 id="cap-h" className="font-display text-xl font-bold">Project Studio behavior checks</h2>
       <p className="mt-1 text-sm text-muted-foreground">From behavior checks passing on your current project code. Change the code and a skill waits for a fresh run.</p>
       {loading ? <div className="mt-4 h-12 rounded-xl bg-muted animate-pulse" /> : items.length === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">Nothing proven yet. <Link href="/build" className="underline underline-offset-4 text-foreground">Build the Product Filter App</Link> and run its checks.</p>
+        <p className="mt-4 text-sm text-muted-foreground">No current Project Studio checks yet. <Link href="/build" className="underline underline-offset-4 text-foreground">Build the Product Filter App</Link> and run its checks.</p>
       ) : (
         <ul className="mt-4 grid gap-2 sm:grid-cols-2">
           {items.map((it) => (

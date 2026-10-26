@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { emptyLearning, type LearningProgress, type LearningEvidence, type QuizSession, type ModuleQuizAttempt } from "./learning-progress";
 import { validateProgress } from "./progress-schema";
 
 export type Attempt = { lessonId: string; at: string; passed: boolean; kind: "challenge" | "quiz" };
@@ -10,6 +11,7 @@ export type State = {
   goal: "javascript" | "portfolio" | "full" | null;
   showStats: boolean;
   version: 1;
+  learning: LearningProgress;
   dailyGoal: number;
   completed: Record<string, string>;
   attempts: Attempt[];
@@ -23,7 +25,7 @@ export type State = {
 const KEY = "codepath:v1";
 const initial = (): State => ({
   goal: null, showStats: false,
-  version: 1, dailyGoal: 2, completed: {}, attempts: [], drafts: {}, reviews: {}, projects: {}, assessment: null, activity: {},
+  version: 1, learning: emptyLearning(), dailyGoal: 2, completed: {}, attempts: [], drafts: {}, reviews: {}, projects: {}, assessment: null, activity: {},
 });
 
 let storageStatus = { error: null as string | null, blocked: false };
@@ -101,6 +103,19 @@ function bump(s: State): Record<string, number> {
 }
 
 export const actions = {
+  checkReading: (lessonId: string) => set((s) => ({ ...s, learning: { ...s.learning, readings: { ...s.learning.readings, [lessonId]: new Date().toISOString() } } })),
+  saveLearningEvidence: (id: string, evidence: LearningEvidence) => set((s) => {
+    const prior = s.learning.evidence[id];
+    const passed = evidence.results.length > 0 && evidence.results.every(r=>r.passed);
+    const newPass = passed && (!prior || prior.source !== evidence.source || !prior.results.every(r=>r.passed));
+    return { ...s, activity: newPass ? bump(s) : s.activity, learning: { ...s.learning, evidence: { ...s.learning.evidence, [id]: evidence } } };
+  }),
+  saveQuizSession: (courseId: string, active: QuizSession) => set((s) => ({ ...s, learning: { ...s.learning, quizzes: { ...s.learning.quizzes, [courseId]: { attempts: s.learning.quizzes[courseId]?.attempts ?? [], active } } } })),
+  finishModuleQuiz: (courseId: string, attempt: ModuleQuizAttempt) => set((s) => {
+    const old = s.learning.quizzes[courseId];
+    if (old?.attempts.some((item) => item.id === attempt.id)) return s;
+    return { ...s, activity: attempt.passed ? bump(s) : s.activity, learning: { ...s.learning, quizzes: { ...s.learning.quizzes, [courseId]: { active: null, attempts: [...(old?.attempts ?? []), attempt] } } } };
+  }),
   setGoal: (goal: State["goal"]) => set((s) => ({ ...s, goal })),
   setShowStats: (showStats: boolean) => set((s) => ({ ...s, showStats })),
   setDailyGoal: (n: number) => set((s) => ({ ...s, dailyGoal: n })),

@@ -1,3 +1,4 @@
+import { BootcampEvidence } from "@/components/learning-roadmap";
 import { Link } from "wouter";
 import { useStore, dayKey, addDays, streak } from "@/lib/store";
 import { LESSONS, TRACKS, lessonById, PROJECTS } from "@/lib/curriculum";
@@ -21,6 +22,7 @@ export default function ProgressPage() {
         Everything here is computed from your saved activity. No estimates, no padding.
       </PageHeader>
 
+      <BootcampEvidence />
       <Capabilities />
 
       <dl className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">

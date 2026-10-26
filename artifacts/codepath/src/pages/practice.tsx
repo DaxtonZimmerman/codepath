@@ -1,3 +1,4 @@
+import { MixedPractice } from "@/components/mixed-practice";
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Search, RefreshCw, CalendarClock } from "lucide-react";
@@ -36,6 +37,7 @@ export default function Practice() {
         Misses come back tomorrow. Passes check in after three days. That rhythm is how things stick.
       </PageHeader>
 
+      <MixedPractice />
       <ProjectReviews />
 
       <section className="grid md:grid-cols-2 gap-5 mb-12">

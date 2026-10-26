@@ -17,6 +17,7 @@ import Settings from '@/pages/settings';
 import Build from '@/pages/build';
 import Studio from '@/pages/studio';
 import CoursePage from '@/pages/course';
+import LearningActivity from '@/pages/learning-activity';
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Dashboard} />
           <Route path="/learn" component={PathPage} />
+          <Route path="/learn/:courseId/:activity" component={LearningActivity} />
           <Route path="/learn/:courseId" component={CoursePage} />
           <Route path="/path" component={PathPage} />
           <Route path="/build" component={Build} />

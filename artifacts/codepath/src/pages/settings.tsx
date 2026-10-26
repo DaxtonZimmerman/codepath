@@ -80,7 +80,7 @@ export default function Settings() {
 
       <section className="rounded-3xl border-2 border-foreground/80 bg-card p-5 sm:p-8" aria-labelledby="bk-h">
         <h2 id="bk-h" className="font-display text-2xl font-bold">Backup and restore</h2>
-        <p className="text-sm text-muted-foreground mt-1">One JSON file with your lesson progress and Studio projects. Download one before big changes.</p>
+        <p className="text-sm text-muted-foreground mt-1">One JSON file with readings, workshop and lab drafts, quiz attempts, reflections, project reviews and Studio projects. Download one before big changes.</p>
         <div className="mt-5 flex flex-wrap gap-3">
           <button onClick={onExport} disabled={busy} className="press inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-5 py-2.5 font-semibold disabled:opacity-60" data-testid="button-export-backup"><Download className="size-4" /> Export my Codepath data</button>
           <button onClick={() => fileRef.current?.click()} disabled={busy} className="press inline-flex items-center gap-2 rounded-xl border-2 px-5 py-2.5 font-semibold disabled:opacity-60" data-testid="button-choose-backup"><Upload className="size-4" /> Choose a backup file</button>
@@ -132,15 +132,15 @@ export default function Settings() {
       </section>
 
       <section className="rounded-3xl border-2 border-destructive/40 bg-card p-5 sm:p-8" aria-labelledby="reset-h">
-        <h2 id="reset-h" className="font-display text-2xl font-bold">Reset lesson progress</h2>
-        <p className="text-sm text-muted-foreground mt-1">Erases lesson progress, attempts, drafts, reviews, skills check and legacy project checklists in this browser. Studio projects are not deleted.</p>
+        <h2 id="reset-h" className="font-display text-2xl font-bold">Reset learning progress</h2>
+        <p className="text-sm text-muted-foreground mt-1">Erases reading checks, workshop and lab progress, active quizzes and quiz history, lesson attempts, drafts, reviews, skills check and project checklists in this browser. Studio projects are not deleted.</p>
         <AlertDialog onOpenChange={() => setConfirm("")}>
           <AlertDialogTrigger asChild>
-            <button className="press mt-5 inline-flex items-center gap-2 rounded-xl bg-destructive text-destructive-foreground px-5 py-2.5 font-semibold" data-testid="button-reset-open"><Trash2 className="size-4" /> Reset lesson progress</button>
+            <button className="press mt-5 inline-flex items-center gap-2 rounded-xl bg-destructive text-destructive-foreground px-5 py-2.5 font-semibold" data-testid="button-reset-open"><Trash2 className="size-4" /> Reset learning progress</button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-display text-2xl">Erase lesson progress?</AlertDialogTitle>
+              <AlertDialogTitle className="font-display text-2xl">Erase learning progress?</AlertDialogTitle>
               <AlertDialogDescription>
                 {Object.keys(s.completed).length} passed lessons, {s.attempts.length} attempts, drafts, reviews and legacy project notes will be deleted. Studio projects stay. Type RESET to confirm.
               </AlertDialogDescription>
@@ -149,8 +149,8 @@ export default function Settings() {
             <input id="reset-confirm" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="RESET" className="rounded-xl border-2 px-3 py-2 font-mono focus:border-foreground outline-none" data-testid="input-reset-confirm" />
             <AlertDialogFooter>
               <AlertDialogCancel data-testid="button-reset-cancel">Keep my progress</AlertDialogCancel>
-              <AlertDialogAction disabled={confirm !== "RESET"} onClick={() => { actions.reset(); toast({ title: "Lesson progress reset", description: "Studio projects were kept." }); }} className="bg-destructive text-destructive-foreground" data-testid="button-reset-confirm">
-                Erase lesson progress
+              <AlertDialogAction disabled={confirm !== "RESET"} onClick={() => { actions.reset(); toast({ title: "Learning progress reset", description: "Studio projects were kept." }); }} className="bg-destructive text-destructive-foreground" data-testid="button-reset-confirm">
+                Erase learning progress
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

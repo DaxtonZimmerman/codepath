@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { ArrowRight, Compass, RefreshCw, Flame, Hammer, BookOpen } from "lucide-react";
 import { useStore, streak } from "@/lib/store";
 import { LESSONS, trackName, PROJECTS } from "@/lib/curriculum";
+import { nextLearningAction } from "@/lib/learning";
 import { nextLesson, dueReviews, todayCount } from "@/lib/progress";
 import { GoalPicker, goalLabel } from "@/components/goal-picker";
 import { useProjects } from "@/lib/studio-db";
@@ -11,6 +12,7 @@ import { MILESTONES } from "@/lib/studio-content";
 export default function Dashboard() {
   const s = useStore();
   const next = nextLesson(s);
+  const learning = nextLearningAction(s);
   const due = dueReviews(s);
   const done = Object.keys(s.completed).length;
   const today = todayCount(s);
@@ -43,7 +45,7 @@ export default function Dashboard() {
         <h1 className="font-display text-4xl sm:text-5xl font-extrabold leading-[1.02]">Here is <span className="marker">your next step.</span></h1>
       </header>
 
-      {active ? (
+      {!buildFirst && learning ? (<Link href={learning.href} className="lift block rounded-3xl bg-ink p-6 text-background sm:p-9" data-testid="card-primary-action"><p className="font-mono text-xs uppercase tracking-widest text-marker">Bootcamp · {learning.kind}</p><h2 className="mt-3 font-display text-3xl font-extrabold">{learning.title}</h2><p className="mt-3 text-sm text-background/70">Read → practise → workshop → lab → review → quiz → your own app. Your next step follows the whole module.</p><span className="mt-6 inline-block rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground">Continue learning →</span></Link>) : active ? (
         <Link href={`/build/${active.id}`} className="lift rise group relative block overflow-hidden rounded-3xl bg-ink text-background p-6 sm:p-9" data-testid="card-primary-action">
           <div aria-hidden className="absolute -right-8 -bottom-14 font-mono text-[9rem] sm:text-[11rem] leading-none text-background/5 select-none">{"</>"}</div>
           <p className="font-mono text-xs uppercase tracking-widest text-marker">Project in progress{active.kind === "product-filter" ? ` · step ${active.step + 1} of 6` : ""}</p>
@@ -79,12 +81,11 @@ export default function Dashboard() {
         </Link>
       )}
 
+      {active && !buildFirst && <Link href={`/build/${active.id}`} className="block text-sm font-semibold text-primary underline">Continue your app: {active.title} →</Link>}
       <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-        {active && next ? (
-          <Link href={`/lesson/${next.id}`} className="inline-flex items-center gap-1.5 font-semibold text-primary underline-offset-4 hover:underline" data-testid="link-secondary-lesson">Or continue learning: {next.title} <ArrowRight className="size-3.5" /></Link>
-        ) : buildFirst && next ? (
-          <Link href={`/lesson/${next.id}`} className="inline-flex items-center gap-1.5 font-semibold text-primary underline-offset-4 hover:underline" data-testid="link-secondary-lesson">Or continue learning: {next.title} <ArrowRight className="size-3.5" /></Link>
-        ) : next ? (
+        {buildFirst && learning ? (
+          <Link href={learning.href} className="inline-flex items-center gap-1.5 font-semibold text-primary underline-offset-4 hover:underline" data-testid="link-secondary-lesson">Or continue learning: {learning.title} <ArrowRight className="size-3.5" /></Link>
+        ) : !active && learning ? (
           <Link href="/build" className="inline-flex items-center gap-1.5 font-semibold text-primary underline-offset-4 hover:underline" data-testid="link-secondary-build">Or start a JavaScript project <ArrowRight className="size-3.5" /></Link>
         ) : null}
         <Link href="/learn" className="text-muted-foreground underline-offset-4 hover:underline" data-testid="link-browse-lessons">Browse all lessons</Link>
