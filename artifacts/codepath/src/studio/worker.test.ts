@@ -59,3 +59,35 @@ it("runs reading experiments through the worker with bounded console output", ()
   scope.onmessage({data:{id:1,type:"experiment",code:'throw new Error("example failed");'}});
   expect(messages.find(m=>m.type==='reply').error).toBe('example failed');
 });
+
+// Trusted authored fixtures validate the actual workshop-to-app adapter in the isolated runtime.
+import { workshopAppFiles } from '../lib/workshop-project';
+it('connects checked checkout rules to a working price-calculator form',()=>{
+ const source='function checkout(p,q,m){if(!Number.isInteger(p)||p<0||!Number.isInteger(q)||q<0||typeof m!=="boolean")return "Invalid input";const t=p*q;return "$"+((m&&t>=5000?Math.round(t*.9):t)/100).toFixed(2);}';
+ request({type:'init',files:workshopAppFiles('js',source)});
+ request({type:'event',selector:'#checkout-form',event:'submit'});expect(messages.find(m=>m.type==='render').html).toContain('$50.00');
+ request({type:'event',selector:'#member',event:'change',value:'on',checked:true});request({type:'event',selector:'#checkout-form',event:'submit'});expect(messages.find(m=>m.type==='render').html).toContain('$45.00');
+ request({type:'event',selector:'#quantity',event:'input',value:'1.5'});request({type:'event',selector:'#checkout-form',event:'submit'});expect(messages.find(m=>m.type==='render').html).toContain('Invalid input');
+ request({type:'event',selector:'#price',event:'input',value:''});request({type:'event',selector:'#checkout-form',event:'submit'});expect(messages.find(m=>m.type==='render').html).toContain('Enter a price and quantity.');
+});
+it('connects the learner catalog pipeline to search, category, sorting and empty states',()=>{
+ const source='function catalog(products,q,c){return products.filter(p=>p.name.toLowerCase().includes(q.trim().toLowerCase())&&(c==="all"||p.category===c)).sort((a,b)=>a.price-b.price);}';
+ let result=request({type:'init',files:workshopAppFiles('data',source)});expect(result.cards.map((c:any)=>c.id)).toEqual(['2','4','1','3','5','6']);
+ request({type:'event',selector:'#category',event:'change',value:'tops'});result=request({type:'event',selector:'#sort',event:'change',value:'desc'});expect(result.cards.map((c:any)=>c.id)).toEqual(['1','2']);
+ result=request({type:'event',selector:'#search',event:'input',value:'  LINEN  '});expect(result.cards.map((c:any)=>c.id)).toEqual(['1']);
+ result=request({type:'event',selector:'#search',event:'input',value:'zzzz'});expect(result.cards).toHaveLength(0);expect(result.empty).toBe(true);
+});
+it('activates a submit button once and respects a cancelled click',()=>{
+ const files={'index.html':'<html><body><form><button id="save">Save</button></form><p id="count">0</p></body></html>','styles.css':'','script.js':'let count=0;document.querySelector("form").addEventListener("submit",e=>{e.preventDefault();document.querySelector("#count").textContent=String(++count);});'};
+ request({type:'init',files});request({type:'event',selector:'#save',event:'activate'});expect(messages.find(m=>m.type==='render').html).toContain('>1</p>');
+ request({type:'init',files:{...files,'script.js':files['script.js']+'document.querySelector("#save").addEventListener("click",e=>e.preventDefault());'}});request({type:'event',selector:'#save',event:'activate'});expect(messages.find(m=>m.type==='render').html).toContain('>0</p>');
+});
+it('serializes checked state and preserves initial checkboxes',()=>{
+ const files={'index.html':'<html><body><input id="member" type="checkbox" checked></body></html>','styles.css':'','script.js':''};
+ request({type:'init',files});expect(messages.find(m=>m.type==='render').html).toMatch(/<input[^>]*checked/);
+ request({type:'event',selector:'#member',event:'change',value:'on',checked:false});expect(messages.find(m=>m.type==='render').html).not.toMatch(/<input[^>]*checked/);
+ request({type:'event',selector:'#member',event:'change',value:'on',checked:true});expect(messages.find(m=>m.type==='render').html).toMatch(/<input[^>]*checked/);
+});
+it('keeps a named radio group mutually exclusive in the virtual document',()=>{
+ const files={'index.html':'<html><body><form><input id="a" name="pick" type="radio" checked><input id="b" name="pick" type="radio"></form></body></html>','styles.css':'','script.js':''};request({type:'init',files});request({type:'event',selector:'#b',event:'change',value:'b',checked:true});const html=messages.find(m=>m.type==='render').html;expect((html.match(/checked/g)||[])).toHaveLength(1);expect(html).toMatch(/<input[^>]*(?:id="b"[^>]*checked|checked[^>]*id="b")/);
+});

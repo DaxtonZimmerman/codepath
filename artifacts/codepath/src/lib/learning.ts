@@ -44,7 +44,7 @@ export type LearningAction={href:string;title:string;courseId:string;kind:string
 export function nextLearningAction(s:State,onlyCourse?:string):LearningAction|null {
  const courses=COURSES.filter(c=>onlyCourse?c.id===onlyCourse:s.goal==='javascript'?['js','data','dom','async','test'].includes(c.id):true);
  for(const c of courses) {
-  for(const id of c.lessons) { const l=lessonById(id)!; if(!s.learning.readings[id] || !s.completed[id]) return {href:`/lesson/${id}`,title:l.title,courseId:c.id,kind:!s.learning.readings[id]?'Reading + check':'Practice'}; }
+  for(const id of c.lessons) { const l=lessonById(id)!; if(!s.learning.readings[id] || !lessonPracticePassed(s,id)) return {href:`/lesson/${id}`,title:l.title,courseId:c.id,kind:!s.learning.readings[id]?'Reading + check':'Practice'}; }
   const base=`/learn/${c.id}`;
   if(!workshopDone(s,c.id)) return {href:`${base}/workshop`,title:MODULE_ACTIVITIES[c.id].workshop.title,courseId:c.id,kind:'Guided workshop'};
   if(!labDone(s,c.id)) return {href:`${base}/lab`,title:MODULE_ACTIVITIES[c.id].lab.title,courseId:c.id,kind:'Independent lab'};
@@ -64,4 +64,15 @@ export function workshopSeed(s: State, courseId: string, index: number): string 
  if (!taskPassed(s,key,starter)) return previous.solution;
  const source = taskSource(s,key,starter);
  return current.files && previous.files ? JSON.stringify({...current.files,...JSON.parse(source)}) : source;
+}
+
+/** Old passes remain readable; new source-specific evidence must match the current draft. */
+export function lessonPracticePassed(s: State, lessonId: string): boolean {
+ if(!s.completed[lessonId]) return false;
+ const lesson=lessonById(lessonId);
+ if(!lesson?.challenge && !lesson?.pageExercise) return true;
+ const evidence=s.learning.evidence[`lesson:${lessonId}`];
+ if(!evidence) return true;
+ const source=s.drafts[lessonId] ?? lesson.challenge?.starter ?? lesson.pageExercise!.starter;
+ return evidenceMatches(evidence,source);
 }

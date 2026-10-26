@@ -11,8 +11,13 @@ export function StudioPreview({ files }: { files: Files }) {
   const [doc, setDoc] = useState("");
   const session = useRef("");
   const focusNode = useRef<string | null>(null);
+  const previewScroll = useRef({x:0,y:0});
+  const lastRender = useRef({html:"",css:"",session:""});
   const currentFiles = useRef(files); currentFiles.current = files;
   function render(html: string) {
+    const cssSource = currentFiles.current["styles.css"];
+    if (lastRender.current.html === html && lastRender.current.css === cssSource && lastRender.current.session === session.current) return;
+    lastRender.current = {html,css:cssSource,session:session.current};
     const nonce = crypto.randomUUID().replace(/-/g, "");
     const clean = DOMPurify.sanitize(html, { FORBID_TAGS: ["script", "iframe", "object", "embed", "link", "meta", "base", "style", "svg", "math"], FORBID_ATTR: ["src", "srcset", "href", "action", "formaction", "nonce"] });
     const css = currentFiles.current["styles.css"].replace(/</g, "\\3c ");
@@ -20,16 +25,27 @@ export function StudioPreview({ files }: { files: Files }) {
     const token=${JSON.stringify(session.current)};
     const focusNode=${JSON.stringify(focusNode.current)};
     if(focusNode){const input=document.querySelector('[data-cp-node="'+focusNode+'"]');if(input){input.focus();try{input.setSelectionRange(input.value.length,input.value.length);}catch{}}}
+    const savedScroll=${JSON.stringify(previewScroll.current)};
+    requestAnimationFrame(()=>window.scrollTo(savedScroll.x,savedScroll.y));
+    function relay(target,event){parent.postMessage({token,type:"event",node:target.dataset.cpNode,event,value:target.value,checked:target.checked,scrollX:window.scrollX,scrollY:window.scrollY,focusNode:document.activeElement?.dataset.cpNode},"*");}
     for(const type of ["input","change","click","submit"]) document.addEventListener(type,e=>{
       if(type==="submit")e.preventDefault();
+      if(type==="click"){
+        const button=e.target.closest('button,input[type="submit"],input[type="image"]');
+        if(button && button.form && (button.type==="submit" || button.type==="image")){
+          e.preventDefault();
+          if(button.formNoValidate || button.form.noValidate || button.form.reportValidity()) relay(button,"activate");
+          return;
+        }
+        if(e.target.tagName==="LABEL") return;
+      }
       const target=e.target.closest("[data-cp-node]");
-      if(!target)return;
-      parent.postMessage({token,type:"event",node:target.dataset.cpNode,event:type,value:target.value,checked:target.checked},"*");
+      if(target)relay(target,type);
     });
     </script></body></html>`);
   }
   async function run() {
-    runtime.current?.stop(); session.current = crypto.randomUUID(); setLogs([]); setStatus("Running…");
+    runtime.current?.stop(); session.current = crypto.randomUUID(); setLogs([]); previewScroll.current={x:0,y:0}; setStatus("Running…");
     const rt = new StudioRuntime({
       render,
       log: (level, text) => setLogs((l) => [...l.slice(-99), `${level}: ${text}`]),
@@ -42,8 +58,9 @@ export function StudioPreview({ files }: { files: Files }) {
   useEffect(() => {
     const listener = (e: MessageEvent) => {
       if (e.source !== frame.current?.contentWindow || e.data?.token !== session.current || e.data.type !== "event") return;
-      if (!/^\d+$/.test(e.data.node) || !["input", "change", "click", "submit"].includes(e.data.event)) return;
-      focusNode.current = e.data.event === "input" ? e.data.node : null;
+      if (!/^\d+$/.test(e.data.node) || !["input", "change", "click", "submit", "activate"].includes(e.data.event)) return;
+      if(Number.isFinite(e.data.scrollX)&&Number.isFinite(e.data.scrollY)) previewScroll.current={x:Math.max(0,Math.min(100000,e.data.scrollX)),y:Math.max(0,Math.min(100000,e.data.scrollY))};
+      focusNode.current = typeof e.data.focusNode === "string" && /^\d+$/.test(e.data.focusNode) ? e.data.focusNode : e.data.event === "input" ? e.data.node : null;
       void runtime.current?.event(`[data-cp-node="${e.data.node}"]`, e.data.event, typeof e.data.value === "string" ? e.data.value : undefined, typeof e.data.checked === "boolean" ? e.data.checked : undefined).catch((error) => setStatus(String(error)));
     };
     window.addEventListener("message", listener);

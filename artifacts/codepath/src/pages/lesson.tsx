@@ -1,131 +1,69 @@
 import { useState } from "react";
 import { Link, useParams, useSearch } from "wouter";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock } from "lucide-react";
-import { LESSONS, lessonById, trackName } from "@/lib/curriculum";
+import { LESSONS, lessonById, trackName, type Lesson } from "@/lib/curriculum";
 import { actions, useStore } from "@/lib/store";
 import { prettyDate } from "@/lib/progress";
 import { ExamplePlayground } from "@/components/example-playground";
-import { readingQuestions } from "@/lib/learning";
+import { lessonPracticePassed, readingQuestions } from "@/lib/learning";
+import { LESSON_COACHING } from "@/lib/lesson-coaching";
 import { PageExercisePanel } from "@/components/page-exercise";
 import { courseById } from "@/lib/bootcamp";
 import { Quiz } from "@/components/quiz";
 import { ChallengePanel } from "@/components/challenge";
+import { LearningWorkspace } from "@/components/learning-workspace";
+import { WorkedTrace, ProjectConnection } from "@/components/lesson-coach";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 
+function LessonWorkspace({ lesson, returnTo }: { lesson: Lesson; returnTo: string | null }) {
+  const s = useStore(), { toast } = useToast();
+  const coding = !!(lesson.challenge || lesson.pageExercise);
+  const [tab, setTab] = useState(() => {
+    const saved = s.drafts[`workspace-tab:${lesson.id}`];
+    return saved === "example" || saved === "check" || coding && saved === "practice" ? saved : s.learning.readings[lesson.id] && coding ? "practice" : "example";
+  });
+  const course = courseById(lesson.track)!;
+  const lessons = LESSONS.filter(item => item.track === lesson.track), index = lessons.indexOf(lesson);
+  const previous = lessons[index - 1], next = lessons[index + 1];
+  const readingPassed = !!s.learning.readings[lesson.id], practicePassed = lessonPracticePassed(s, lesson.id);
+  const complete = readingPassed && practicePassed;
+  const coach = LESSON_COACHING[lesson.id];
+  function result(passed: boolean) {
+    toast({ title: passed ? "Code checks passed" : "Use the first difference to guide your next edit", description: passed ? readingPassed ? "Both lesson checkpoints are saved." : "Finish the reading check when you’re ready." : "The feedback shows what to inspect next." });
+  }
+  function chooseTab(value: string) { setTab(value); actions.saveDraft(`workspace-tab:${lesson.id}`, value); }
+  const reading = <div className="space-y-6">
+    <section className="space-y-4 text-[15px] leading-relaxed"><p className="text-lg font-semibold">{lesson.summary}</p>{lesson.body.map((paragraph, i) => <p key={i}>{paragraph}</p>)}</section>
+    <section className="rounded-xl bg-marker/20 p-4"><h3 className="text-sm font-semibold">Keep these ideas</h3><ul className="mt-3 list-disc space-y-2 pl-5 text-sm">{lesson.takeaways.map(t => <li key={t}>{t}</li>)}</ul></section>
+    <WorkedTrace lessonId={lesson.id} />
+    {coding && <section className="border-t pt-5"><p className="font-mono text-xs uppercase tracking-widest text-primary">Your practice goal</p><p className="mt-3 text-sm leading-relaxed">{lesson.challenge?.prompt ?? lesson.pageExercise?.prompt}</p>{lesson.challenge && <p className="mt-3 text-sm"><strong>Function to define: </strong><code>{lesson.challenge.functionName}</code></p>}</section>}
+    <section className="rounded-xl border p-4"><h3 className="text-sm font-semibold">A common mistake to catch</h3><p className="mt-2 text-sm">{coach.mistake}</p><p className="mt-2 text-sm text-muted-foreground"><strong>Look here: </strong>{coach.fix}</p></section>
+    {lesson.lab && <details className="rounded-xl border p-4"><summary className="cursor-pointer font-semibold text-sm">Apply this in your own editor</summary><p className="mt-3 text-sm font-medium">{lesson.lab.task}</p><ol className="mt-3 list-decimal space-y-2 pl-5 text-sm">{lesson.lab.steps.map(step => <li key={step}>{step}</li>)}</ol><p className="mt-3 text-sm"><strong>Verify: </strong>{lesson.lab.verify}</p><p className="mt-2 text-xs text-muted-foreground">This practical work is self-reviewed; the reading check records your understanding separately.</p></details>}
+    <ProjectConnection lessonId={lesson.id} courseId={course.id} />
+  </div>;
+  return <article className="min-w-0">
+    <Link href={`/learn/${course.id}`} className="mb-5 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" />Module syllabus</Link>
+    {returnTo && <Link href={returnTo} className="mb-5 block rounded-xl bg-ink p-4 text-sm font-semibold text-background">← Back to your project step. Your draft is saved.</Link>}
+    <header><p className="font-mono text-xs uppercase tracking-[0.15em] text-primary">Lesson {index + 1} of {lessons.length} · {trackName(lesson.track)}</p><h1 className="mt-2 font-display text-3xl font-extrabold leading-tight sm:text-4xl">{lesson.title}</h1><div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground"><span className="inline-flex items-center gap-1"><Clock className="size-3.5" />About {lesson.minutes} min</span><span>Read → predict → experiment → check → apply</span>{s.completed[lesson.id] && <span>Previous pass saved {prettyDate(s.completed[lesson.id])}</span>}</div></header>
+    <div className="my-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-3 text-sm" aria-label="Lesson checkpoints"><p><span className={readingPassed ? "font-semibold text-pine" : "text-muted-foreground"}>{readingPassed ? "✓" : "○"} Reading check</span>{coding && <span className={`ml-4 ${practicePassed ? "font-semibold text-pine" : "text-muted-foreground"}`}>{practicePassed ? "✓" : "○"} {s.learning.evidence[`lesson:${lesson.id}`] ? "Current code checks" : "Practice checkpoint"}</span>}</p><Link href={`/learn/${course.id}#project`} className="text-sm font-semibold text-primary underline underline-offset-4">Module project</Link></div>
+    <LearningWorkspace reading={reading}>
+      <Tabs value={tab} onValueChange={chooseTab}>
+        <TabsList className="mb-4 flex h-auto w-full flex-wrap justify-start gap-1 p-1" aria-label="Lesson activities"><TabsTrigger value="example" className="flex-1 py-2.5">Example</TabsTrigger>{coding && <TabsTrigger value="practice" className="flex-1 py-2.5">Practice</TabsTrigger>}<TabsTrigger value="check" className="flex-1 py-2.5">Reading check</TabsTrigger></TabsList>
+        <TabsContent value="example" forceMount className="data-[state=inactive]:hidden"><ExamplePlayground lesson={lesson} /><div className="mt-5 rounded-xl border bg-card p-4 text-sm"><p className="font-semibold">Change one thing, then explain the difference.</p><p className="mt-2 text-muted-foreground">Compare an ordinary input with an empty or boundary case. Use the worked trace in Reading when the result surprises you.</p><button onClick={() => chooseTab(coding ? "practice" : "check")} className="mt-3 font-semibold text-primary underline">{coding ? "Try your own solution" : "Check your understanding"} →</button></div></TabsContent>
+        {coding && <TabsContent value="practice" forceMount className="data-[state=inactive]:hidden"><h3 className="sr-only">Your practice</h3>{['js-values','js-loops','js-debugging'].includes(lesson.id) && s.drafts[lesson.id] && /makeProfile|fizzBuzz|sumNumbers/.test(s.drafts[lesson.id]) && <p className="mb-4 rounded-xl border p-3 text-sm">Your draft is from the earlier exercise. It is kept here; copy it before choosing Reset code if you want to start the new task.</p>}{lesson.pageExercise ? <PageExercisePanel lessonId={lesson.id} exercise={lesson.pageExercise} onResult={result} /> : <ChallengePanel lessonId={lesson.id} challenge={lesson.challenge!} onResult={result} />}<button onClick={() => chooseTab("check")} className="mt-5 text-sm font-semibold text-primary underline">Open the reading check →</button></TabsContent>}
+        <TabsContent value="check" forceMount className="data-[state=inactive]:hidden"><div className="mb-5 rounded-xl bg-card border p-4"><h3 className="font-display text-xl font-bold">Explain the idea</h3><p className="mt-2 text-sm text-muted-foreground">Three questions about this reading. {coding ? "This check is separate from running your code." : "Practical work in your own tools remains a separate self-review."}</p>{readingPassed && <p className="mt-2 text-sm font-semibold text-pine">✓ Your reading check is saved.</p>}</div><Quiz questions={readingQuestions(lesson.id)} onSubmit={ok => { if(ok) actions.checkReading(lesson.id); if(!coding) actions.recordAttempt(lesson.id,ok,"quiz"); toast({title:ok?"Reading check passed":"Review the explanations and try again"}); }} /><label className="mt-6 block text-sm font-semibold">Explain it in your own words<textarea rows={3} value={s.drafts[`reflection:${lesson.id}`] ?? ""} onChange={e => actions.saveDraft(`reflection:${lesson.id}`,e.target.value)} className="mt-2 w-full rounded-xl border bg-card p-3 font-normal" placeholder="What changed? Why does it work? What would you test next?" /></label></TabsContent>
+      </Tabs>
+    </LearningWorkspace>
+    {complete && <Link href={next ? `/lesson/${next.id}` : `/learn/${course.id}/workshop`} className="mt-7 flex items-center gap-3 rounded-2xl bg-pine p-5 text-background" data-testid="link-continue"><CheckCircle2 className="size-5 shrink-0" /><div><p className="font-semibold">Lesson checkpoints saved</p><p className="mt-1 text-sm opacity-85">{next ? `Continue: ${next.title}` : "Put the ideas together in the guided workshop."}</p></div><ArrowRight className="ml-auto size-5 shrink-0" /></Link>}
+    <nav aria-label="Lesson navigation" className="mt-8 flex justify-between gap-4 border-t pt-5 text-sm">{previous ? <Link href={`/lesson/${previous.id}`} className="flex items-center gap-1 hover:text-primary"><ArrowLeft className="size-4 shrink-0" />{previous.title}</Link> : <span />}{next ? <Link href={`/lesson/${next.id}`} className="flex items-center gap-1 text-right hover:text-primary">{next.title}<ArrowRight className="size-4 shrink-0" /></Link> : <Link href={`/learn/${course.id}/workshop`} className="text-primary">Open the guided workshop →</Link>}</nav>
+  </article>;
+}
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const lesson = lessonById(id ?? "");
-  const s = useStore();
-  const { toast } = useToast();
-  const [passedId, setPassedId] = useState<string | null>(null);
-  const justPassed = passedId === lesson?.id;
-  const rt = new URLSearchParams(useSearch()).get("returnTo");
-  const returnTo = rt && /^\/build\/[\w-]+(\?step=\d)?$/.test(rt) ? rt : null;
-
-  if (!lesson) {
-    return (
-      <div className="py-20 text-center rise">
-        <p className="font-mono text-primary">404 · lesson not found</p>
-        <h1 className="font-display text-4xl font-extrabold mt-2">That lesson is not on the path.</h1>
-        <Link href="/learn" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-foreground text-background px-5 py-3 font-semibold" data-testid="link-back-path">See all lessons</Link>
-      </div>
-    );
-  }
-
-  const course = courseById(lesson.track);
-  const courseLessons = LESSONS.filter((item) => item.track === lesson.track);
-  const idx = courseLessons.indexOf(lesson);
-  const prev = courseLessons[idx - 1];
-  const next = courseLessons[idx + 1];
-  const completedAt = s.completed[lesson.id];
-  const review = s.reviews[lesson.id];
-  const tries = s.attempts.filter((a) => a.lessonId === lesson.id).length;
-
-  function handle(passed: boolean) {
-    if (passed) {
-      setPassedId(lesson!.id);
-      toast({ title: completedAt ? "Passed again" : "Lesson complete", description: "Review scheduled in 3 days." });
-    } else {
-      setPassedId(null);
-      toast({ title: "Not yet, and that is useful", description: "This concept is queued for review tomorrow." });
-    }
-  }
-
-  return (
-    <article key={lesson.id} className="max-w-3xl">
-      <Link href={`/learn/${lesson.track}`} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6" data-testid="link-back">
-        <ArrowLeft className="size-4" /> Module syllabus
-      </Link>
-      {returnTo && (
-        <Link href={returnTo} className="mb-6 flex items-center gap-3 rounded-2xl bg-ink text-background px-4 py-3 text-sm" data-testid="link-return-project">
-          <ArrowLeft className="size-4 text-marker shrink-0" /> <span><span className="font-semibold">Back to your project step.</span> <span className="text-background/70">Your code is saved where you left it.</span></span>
-        </Link>
-      )}
-      <header className="rise">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">Lesson {idx + 1} of {courseLessons.length} · {trackName(lesson.track)}</p>
-        <h1 className="mt-3 font-display text-4xl sm:text-5xl font-extrabold leading-[1.02]">{lesson.title}</h1>
-        <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1.5"><Clock className="size-4" /> {lesson.minutes} min</span>
-          {completedAt && <span className="flex items-center gap-1.5 text-pine font-medium" data-testid="status-completed"><CheckCircle2 className="size-4" /> Passed {prettyDate(completedAt)}</span>}
-          {review && <span className="font-mono text-xs" data-testid="text-review-due">review {prettyDate(review.due)}</span>}
-          {tries > 0 && <span className="font-mono text-xs">{tries} {tries === 1 ? "attempt" : "attempts"}</span>}
-        </div>
-      </header>
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4 text-sm">
-        <p>{course?.title} · {courseLessons.filter((item) => s.completed[item.id]).length}/{courseLessons.length} lessons passed</p>
-        <Link href={`/learn/${lesson.track}/workshop`} className="font-semibold text-primary underline underline-offset-4">Guided workshop</Link>
-      </div>
-
-      <section className="mt-10 space-y-5 text-[17px] leading-relaxed rise" style={{ animationDelay: "60ms" }}>
-        <p className="text-xl font-medium">{lesson.summary}</p>
-        {lesson.body.map((p, i) => <p key={i}>{p}</p>)}
-      </section>
-
-      <section className="mt-8" aria-label="Example">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-2">Example</p>
-        <ExamplePlayground key={lesson.id} lesson={lesson} />
-      </section>
-
-      <section className="mt-8 rounded-2xl bg-marker/25 border border-marker p-5">
-        <p className="font-mono text-xs uppercase tracking-widest mb-3">Keep these</p>
-        <ul className="space-y-1.5">{lesson.takeaways.map((t) => <li key={t} className="flex gap-2"><span className="text-primary font-mono">-&gt;</span>{t}</li>)}</ul>
-      </section>
-
-      {lesson.lab && <section className="mt-8 rounded-2xl border-2 border-primary/50 bg-card p-5" aria-label="Apply it in your project">
-        <p className="font-mono text-xs uppercase tracking-widest text-primary">Apply it in your own editor</p>
-        <h2 className="mt-2 font-display text-xl font-bold">{lesson.lab.task}</h2>
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm">{lesson.lab.steps.map((step) => <li key={step}>{step}</li>)}</ol>
-        <p className="mt-4 text-sm"><strong>Verify it: </strong>{lesson.lab.verify}</p>
-        <p className="mt-3 text-xs text-muted-foreground">This lab is reviewed by you. The knowledge check below records your lesson result separately.</p>
-      </section>}
-
-      <section className="mt-10" aria-labelledby="reading-h">
-        <p className="font-mono text-xs uppercase tracking-widest text-primary">Reading check · separate from coding practice</p>
-        <h2 id="reading-h" className="mt-2 mb-5 font-display text-2xl font-bold">Explain the idea first</h2>
-        {s.learning.readings[lesson.id] && <p className="mb-4 text-sm text-pine">✓ Reading check passed and saved. You can practise it again.</p>}
-        <Quiz key={`reading:${lesson.id}`} questions={readingQuestions(lesson.id)} onSubmit={(ok)=>{if(ok)actions.checkReading(lesson.id);if(!lesson.challenge&&!lesson.pageExercise){actions.recordAttempt(lesson.id,ok,"quiz");handle(ok);}}}/>
-        <label className="mt-6 block text-sm font-semibold">In your own words<textarea rows={3} className="mt-2 w-full rounded-xl border bg-card p-3 font-normal" placeholder="Explain the idea, predict an example, or note what still feels unclear." value={s.drafts[`reflection:${lesson.id}`]??''} onChange={e=>actions.saveDraft(`reflection:${lesson.id}`,e.target.value)}/></label>
-      </section>
-      {(lesson.challenge||lesson.pageExercise)&&<section className="mt-12" aria-labelledby="practice-h">
-        <p className="font-mono text-xs uppercase tracking-widest text-primary">Coding practice</p>
-        <h2 id="practice-h" className="font-display text-3xl font-extrabold mb-5">Now you write it</h2>
-        {['js-values','js-loops','js-debugging'].includes(lesson.id)&&s.drafts[lesson.id]&&<p className="mb-4 text-sm text-muted-foreground">This exercise now teaches fundamentals before collections. Your saved draft is kept; use Reset code if it belongs to the earlier exercise.</p>}
-        {lesson.pageExercise ? <PageExercisePanel key={lesson.id} lessonId={lesson.id} exercise={lesson.pageExercise} onResult={handle} /> : <ChallengePanel key={lesson.id} lessonId={lesson.id} challenge={lesson.challenge!} onResult={handle} />}
-      </section>}
-
-      {justPassed && next && (
-        <Link href={`/lesson/${next.id}`} className="pop mt-8 flex items-center gap-4 rounded-2xl bg-pine text-background p-5" data-testid="link-continue">
-          <CheckCircle2 className="size-6" /><div><p className="font-semibold">Nice work. Keep momentum?</p><p className="text-sm opacity-80">{next.title}</p></div><ArrowRight className="ml-auto size-5" />
-        </Link>
-      )}
-
-      {justPassed && !next && <Link href={`/learn/${lesson.track}/workshop`} className="mt-8 flex items-center gap-3 rounded-2xl bg-pine p-5 text-background" data-testid="link-module-project"><CheckCircle2 className="size-5 shrink-0" /><div><p className="font-semibold">You passed this lesson. Continue with the guided workshop.</p><p className="mt-1 text-sm opacity-80">Build a complete solution step by step, then try the independent lab.</p></div><ArrowRight className="ml-auto size-5 shrink-0" /></Link>}
-
-      <nav className="mt-14 pt-6 border-t flex justify-between gap-4" aria-label="Lesson navigation">
-        {prev ? <Link href={`/lesson/${prev.id}`} className="text-sm hover:text-primary flex items-center gap-1" data-testid="link-prev-lesson"><ArrowLeft className="size-4" /> {prev.title}</Link> : <span />}
-        {next ? <Link href={`/lesson/${next.id}`} className="text-sm hover:text-primary flex items-center gap-1 text-right" data-testid="link-next-lesson">{next.title} <ArrowRight className="size-4" /></Link> : <Link href={`/learn/${lesson.track}/workshop`} className="text-right text-sm text-primary">Continue to the workshop <ArrowRight className="inline size-4" /></Link>}
-      </nav>
-    </article>
-  );
+  const requested = new URLSearchParams(useSearch()).get("returnTo");
+  const returnTo = requested && /^\/build\/[\w-]+(\?step=\d)?$/.test(requested) ? requested : null;
+  if(!lesson) return <div className="py-12"><h1 className="font-display text-3xl font-bold">Lesson not found</h1><Link href="/learn" className="mt-5 inline-block underline">Open the curriculum</Link></div>;
+  return <LessonWorkspace key={lesson.id} lesson={lesson} returnTo={returnTo} />;
 }

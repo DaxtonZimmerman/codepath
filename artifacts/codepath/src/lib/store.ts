@@ -104,11 +104,11 @@ function bump(s: State): Record<string, number> {
 
 export const actions = {
   checkReading: (lessonId: string) => set((s) => ({ ...s, learning: { ...s.learning, readings: { ...s.learning.readings, [lessonId]: new Date().toISOString() } } })),
-  saveLearningEvidence: (id: string, evidence: LearningEvidence) => set((s) => {
+  saveLearningEvidence: (id: string, evidence: LearningEvidence, countActivity = true) => set((s) => {
     const prior = s.learning.evidence[id];
     const passed = evidence.results.length > 0 && evidence.results.every(r=>r.passed);
     const newPass = passed && (!prior || prior.source !== evidence.source || !prior.results.every(r=>r.passed));
-    return { ...s, activity: newPass ? bump(s) : s.activity, learning: { ...s.learning, evidence: { ...s.learning.evidence, [id]: evidence } } };
+    return { ...s, activity: newPass && countActivity ? bump(s) : s.activity, learning: { ...s.learning, evidence: { ...s.learning.evidence, [id]: evidence } } };
   }),
   saveQuizSession: (courseId: string, active: QuizSession) => set((s) => ({ ...s, learning: { ...s.learning, quizzes: { ...s.learning.quizzes, [courseId]: { attempts: s.learning.quizzes[courseId]?.attempts ?? [], active } } } })),
   finishModuleQuiz: (courseId: string, attempt: ModuleQuizAttempt) => set((s) => {

@@ -1,7 +1,9 @@
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useId, useRef, useState, type KeyboardEvent } from "react";
 
 export function CodeEditor({ value, onChange, label, onRun, filename = "solution.js" }: { value: string; onChange: (v: string) => void; label: string; onRun?: () => void; filename?: string }) {
   const ref = useRef<HTMLTextAreaElement>(null);
+  const gutter = useRef<HTMLDivElement>(null);
+  const helpId = useId();
   // After Escape, the next Tab moves focus out instead of indenting.
   const [escaped, setEscaped] = useState(false);
   const lines = value.split("\n").length;
@@ -26,18 +28,16 @@ export function CodeEditor({ value, onChange, label, onRun, filename = "solution
       <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 px-4 py-2.5 border-b border-white/10">
         <span aria-hidden className="size-2.5 rounded-full bg-primary" /><span aria-hidden className="size-2.5 rounded-full bg-marker" /><span aria-hidden className="size-2.5 rounded-full bg-pine" />
         <span className="ml-3 font-mono text-xs text-white/60 truncate min-w-0">{filename}</span>
-        <span className="ml-auto font-mono text-[10px] text-white/50" id={`kbd-${filename}`} aria-live="polite">
-          {escaped ? "Tab now leaves the editor" : "Tab indents · Esc then Tab leaves · Ctrl+Enter runs"}
+        <span className="ml-auto font-mono text-[10px] text-white/50" id={helpId} aria-live="polite">
+          {escaped ? "Tab now leaves the editor" : onRun ? "Tab indents · Esc then Tab leaves · Ctrl+Enter runs" : "Tab indents · Esc then Tab leaves"}
         </span>
       </div>
-      <div className="flex min-w-0 font-mono text-[13.5px] leading-6">
-        <div aria-hidden className="select-none text-right pr-3 pl-3 sm:pl-4 py-4 text-white/30 shrink-0">
-          {Array.from({ length: lines }, (_, i) => <div key={i}>{i + 1}</div>)}
-        </div>
+      <div className="relative flex min-w-0 overflow-hidden font-mono text-[13.5px] leading-6">
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-12 overflow-hidden border-r border-white/10 text-right text-white/30"><div ref={gutter} className="py-4 pr-3">{Array.from({length: lines}, (_,i)=><div key={i}>{i+1}</div>)}</div></div>
         <textarea
           ref={ref}
           aria-label={label}
-          aria-describedby={`kbd-${filename}`}
+          aria-describedby={helpId}
           data-testid="input-code"
           spellCheck={false}
           autoCapitalize="off"
@@ -46,8 +46,9 @@ export function CodeEditor({ value, onChange, label, onRun, filename = "solution
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={onKey}
           onBlur={() => setEscaped(false)}
-          rows={Math.max(10, lines + 1)}
-          className="flex-1 min-w-0 w-full bg-transparent resize-none outline-none py-4 pr-4 text-[hsl(40_40%_92%)] caret-[hsl(var(--marker))] whitespace-pre overflow-x-auto"
+          rows={Math.min(20, Math.max(10, lines + 1))}
+          onScroll={e => { if(gutter.current) gutter.current.style.transform = `translateY(-${e.currentTarget.scrollTop}px)`; }}
+          className="ml-12 flex-1 min-w-0 w-full bg-transparent resize-none outline-none py-4 pr-4 text-[hsl(40_40%_92%)] caret-[hsl(var(--marker))] whitespace-pre overflow-x-auto"
         />
       </div>
     </div>

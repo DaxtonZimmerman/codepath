@@ -64,6 +64,7 @@ function StorageBanner() {
 export function Shell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const [open, setOpen] = useState(false);
+  const learningLayout = loc.startsWith("/lesson/") || /^\/learn\/[^/]+\/(workshop|lab)$/.test(loc);
   const s = useStore();
   const done = todayCount(s);
   const pct = Math.min(100, (done / s.dailyGoal) * 100);
@@ -150,7 +151,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <main id="main" tabIndex={-1} className="flex-1 min-w-0 px-4 sm:px-8 lg:px-12 py-8 lg:py-12 max-w-6xl outline-none">
+      <main id="main" tabIndex={-1} className={`flex-1 min-w-0 px-4 sm:px-8 lg:px-10 py-6 lg:py-8 outline-none ${learningLayout ? "max-w-[1600px]" : "max-w-6xl"}`}>
         <StorageBanner />
         {children}
       </main>

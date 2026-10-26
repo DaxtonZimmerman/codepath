@@ -7,10 +7,15 @@ Codepath is a web development learning app that helps people practice JavaScript
 ## What it does
 
 - Offers a 12-module, 60-lesson bootcamp from HTML and CSS through JavaScript, React, APIs, SQL, testing, and deployment.
-- Gives each reading an editable example, three comprehension questions, optional reflection, and separate coding practice where supported.
+- Gives all 60 readings a responsive learning workspace: explanation beside the editor on desktop, with Reading/Workspace controls on phones. Example, practice and reading-check panels keep their state when switched.
+- Adds an original prediction, three-step worked trace, common mistake and concrete app task to every lesson. JavaScript/data examples produce visible console output; other environments have accurate file types and run instructions.
+- Gives each reading three comprehension questions, optional reflection, and separate coding practice where supported.
+- Explains failed checks with expected/received values and a next inspection, and saves results against the code version that produced them. Editing makes those results stale without erasing earlier history.
 - Includes 12 cumulative workshops (36 steps), 12 independent labs, 12 review pages, and a 283-question assessment bank.
 - Draws ten questions covering every lesson for each module quiz, shuffles answer order, saves unfinished attempts, requires 90% to pass, and links missed answers to their reading.
 - Carries learner code between workshop steps and ties activity results to the exact checked source; edits require a fresh check.
+- Turns completed HTML, JavaScript and collection workshops into separate Studio apps using learner source. Existing Studio copies are opened rather than overwritten. Advanced workshops export the learner’s files plus the next project brief.
+- Supports native submit-button activation, keyboard submission and checked control state in the isolated Studio preview, with focus and scroll preserved across rendering.
 - Provides mixed practice and focused review links from recent quiz misses.
 - Includes six existing browser HTML/CSS lesson labs and JavaScript challenges with disclosed automated cases.
 - Gives every module a project brief, deliverables, saved reflection, and a self-review.
@@ -57,7 +62,7 @@ Progress and projects are stored in the browser, so they do not sync across devi
 
 Old lesson IDs, drafts and completion history remain readable. An additive learning record stores reading checks, source-specific activity evidence, active quizzes and attempt history. Existing backups default to an empty learning record; new backups preserve and merge these records. The first JavaScript exercises now use strings and scalar calculations before introducing collections; older drafts remain available and can be reset explicitly by the learner.
 
-Tests cover curriculum links, all reading checks, quiz coverage and scoring, retakes, reference solutions, input immutability, worker experiments, progress compatibility and backup recovery. Browser verification covers cumulative steps, stale evidence, HTML checks, external downloads, reading checks and quiz resume/result/retry flows.
+Tests cover curriculum links, all reading checks, quiz coverage and scoring, retakes, reference solutions, input immutability, worker experiments, progress compatibility and backup recovery. Browser verification covers all 60 lesson pages and 24 workshop/lab pages, a 390px learning viewport, draft and unfinished-answer preservation when switching views, current-code feedback, cumulative steps, HTML checks, external downloads, quiz flows, and a working calculator created from workshop source. Worker tests also exercise the generated calculator/catalog and native form/control behavior.
 
 ## Deployment
 

@@ -276,7 +276,7 @@ export default function Studio() {
         {/* Workspace */}
         <div className="min-w-0 space-y-4">
           {!guided && (
-            <p className="rounded-2xl bg-marker/25 border border-marker p-4 text-sm">Your own idea. Edit the three files, watch the preview, and save versions when something works. Use Notes for your plan.</p>
+            <p className="rounded-2xl bg-marker/25 border border-marker p-4 text-sm">{p.sourceActivity ? "Your workshop code is copied into this app. Choose Run preview, try its main flow, then customize one feature. Export ZIP when you are ready to run or publish the files separately." : "Your own idea. Edit the three files, watch the preview, and save versions when something works. Use Notes for your plan."}</p>
           )}
           {example ? (
             <div className="space-y-3" data-testid="panel-example">

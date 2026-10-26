@@ -16,6 +16,11 @@ function snapshot() {
     document.querySelectorAll("*").forEach((el) => {
       if (!el.hasAttribute("data-cp-node")) el.setAttribute("data-cp-node", String(++nextId));
     });
+    document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => {
+      const checked = !!(el as HTMLInputElement).checked;
+      if (checked && !el.hasAttribute('checked')) el.setAttribute('checked', '');
+      if (!checked && el.hasAttribute('checked')) el.removeAttribute('checked');
+    });
     const html = document.body.innerHTML;
     if (html.length > 300000) throw new Error("Preview is too large. Reduce the number of rendered elements.");
     send({ type: "render", html });
@@ -36,14 +41,25 @@ function setValue(el: Element, value: string, checked?: boolean) {
     const match = Array.from(el.querySelectorAll("option")).find((option) => option.getAttribute("value") === value);
     match?.setAttribute("selected", "");
   } else (el as HTMLInputElement).value = value;
-  if (checked !== undefined) (el as HTMLInputElement).checked = checked;
+  if (checked !== undefined) {
+    (el as HTMLInputElement).checked = checked;
+    if (checked && el.getAttribute("type") === "radio" && el.getAttribute("name")) {
+      document.querySelectorAll('input[type="radio"]').forEach(other => {
+        if (other !== el && other.getAttribute("name") === el.getAttribute("name") && other.closest("form") === el.closest("form")) (other as HTMLInputElement).checked = false;
+      });
+    }
+  }
 }
 function dispatch(selector: string, type: string, value?: string, checked?: boolean) {
   const el = document.querySelector(selector);
   if (!el) throw new Error(`Could not find ${selector}. Keep the starter control IDs.`);
   if (value !== undefined) setValue(el, value, checked);
-  const ev = new window.Event(type, { bubbles: true, cancelable: true });
+  const ev = new window.Event(type === "activate" ? "click" : type, { bubbles: true, cancelable: true });
   el.dispatchEvent(ev);
+  if (type === "activate" && !ev.defaultPrevented) {
+    const form = el.closest("form") ?? (el.getAttribute("form") ? document.getElementById(el.getAttribute("form")!) : null);
+    form?.dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true }));
+  }
 }
 function inspect() {
   return {
@@ -59,6 +75,9 @@ self.onmessage = ({ data }) => {
     if (data.type === "init") {
       observer?.disconnect(); logCount = 0; nextId = 0;
       ({ document, window } = parseHTML(data.files["index.html"] || "<html><body></body></html>"));
+      document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => {
+        (el as HTMLInputElement).checked = el.hasAttribute('checked');
+      });
       document.querySelectorAll("select").forEach((select) => {
         if (!select.querySelector("option[selected]")) {
           const first = select.querySelector("option");
